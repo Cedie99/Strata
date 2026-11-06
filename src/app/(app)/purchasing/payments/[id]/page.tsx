@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { PrintButton } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,7 +34,7 @@ export default async function SupplierPaymentPage({ params }: { params: Promise<
 
   return (
     <>
-      <PageHeader title={`${payment.number} · ${payment.supplier.name}`} />
+      <PageHeader title={`${payment.number} · ${payment.supplier.name}`} actions={<PrintButton href={`/print/check-voucher/${id}`} label="Print voucher" />} />
       <Tabs tabs={listTabs("/purchasing/payments", true)} />
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Card title="Payment">

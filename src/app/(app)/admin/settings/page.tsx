@@ -33,7 +33,13 @@ export default async function SettingsPage() {
             maxLength={3}
             required
           />
-          <TextAreaField name="company.address" label="Address" defaultValue={settings["company.address"]} />
+          <TextAreaField name="company.address" label="Registered address" defaultValue={settings["company.address"]} />
+          <div className="grid gap-4 sm:grid-cols-3">
+            <TextField name="company.tin" label="TIN" defaultValue={settings["company.tin"]} placeholder="123-456-789-00000" />
+            <TextField name="company.phone" label="Phone" defaultValue={settings["company.phone"]} />
+            <TextField name="company.email" label="Email" type="email" defaultValue={settings["company.email"]} />
+          </div>
+          <p className="text-xs text-muted">Name, address, TIN, phone and email are printed on the letterhead of every printed document.</p>
           <SubmitButton>Save settings</SubmitButton>
         </ActionForm>
       </Card>

@@ -274,6 +274,14 @@ const settingsSchema = z.object({
     .toUpperCase()
     .regex(/^[A-Z]{3}$/, "Use a 3-letter currency code, e.g. PHP"),
   "company.address": z.string().trim().max(500).default(""),
+  "company.tin": z
+    .string()
+    .trim()
+    .max(20)
+    .refine((v) => v === "" || /^d{3}-?d{3}-?d{3}(-?d{3,5})?$/.test(v), "Use the TIN format 123-456-789-00000")
+    .default(""),
+  "company.phone": z.string().trim().max(50).default(""),
+  "company.email": z.string().trim().max(200).default(""),
 });
 
 export async function saveSettings(_state: ActionState, formData: FormData): Promise<ActionState> {

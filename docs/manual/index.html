@@ -40,7 +40,7 @@
 </nav>
 
 <main class="wrap">
-  <div class="toc"><span>On this page</span><a href="#map">System map</a><a href="#screen">The screen</a><a href="#lists">Lists and records</a><a href="#rules">Rules everywhere</a><a href="#pages">Manual pages</a></div>
+  <div class="toc"><span>On this page</span><a href="#map">System map</a><a href="#screen">The screen</a><a href="#lists">Lists and records</a><a href="#print">Printing</a><a href="#rules">Rules everywhere</a><a href="#pages">Manual pages</a></div>
 
   <h2 id="map">How the modules connect</h2>
   <p class="sub">Goods flow left to right: bought in Purchasing, held in Inventory, sold in Sales. Every step posts to the general ledger by itself. Finance reads the results; Setup decides who can do what.</p>
@@ -193,6 +193,40 @@
       </ol>
     </div>
   </div>
+
+  <h2 id="print">Printing and PDFs</h2>
+  <p class="sub">Every document can be printed or saved as a PDF on your letterhead.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Print or save a document</h3>
+      <ol>
+        <li>Open the document and click <b>Print</b> (or <b>Print voucher</b>). It opens in a new tab.</li>
+        <li>Choose the paper: A4, Letter (short bond) or Legal (long bond). Strata remembers it on this computer.</li>
+        <li>Click <b>Print / Save as PDF</b>. In the print window pick a printer, or "Save as PDF".</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>What is on every printout</h3>
+      <ol>
+        <li>Your logo, company name, address, TIN, phone and email (Setup → Company settings and Branding).</li>
+        <li>The document number, dates, party, lines and totals; amounts in words on money documents.</li>
+        <li>Signature lines (prepared, checked, approved, received) and "printed by … on …" at the bottom.</li>
+        <li>Page numbers when a document runs over one page.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="scroll" style="margin-top:14px">
+    <table>
+      <thead><tr><th>Module</th><th>Printable documents</th></tr></thead>
+      <tbody>
+        <tr><th>Sales</th><td>Sales invoice, payment (acknowledgment) receipt, statement of account</td></tr>
+        <tr><th>Purchasing</th><td>Purchase order, receiving report, accounts payable voucher, check / disbursement voucher</td></tr>
+        <tr><th>Inventory</th><td>Stock receipt, issue slip, adjustment, transfer slip</td></tr>
+        <tr><th>Accounting</th><td>Journal voucher</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><b>Internal copies.</b>Sales invoices and receipts printed from Strata say "Internal copy" and are not BIR-registered invoices or receipts. Keep issuing official invoices from your registered system until Strata is registered with the BIR.</div>
 
   <h2 id="rules">Rules that apply everywhere</h2>
   <p class="sub">These keep the books trustworthy for auditors and the BIR. The database itself enforces them.</p>

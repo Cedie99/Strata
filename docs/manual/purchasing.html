@@ -62,6 +62,7 @@
         <li>Saving a PO <b>does not change stock or the books</b>. It is a commitment, not a transaction.</li>
         <li>Status moves by itself: <span class="mono">Open → Partly received → Received</span>.</li>
         <li>If the rest is not coming, <b>Close</b> the order. If nothing arrived, <b>Cancel</b> it. Orders are never edited.</li>
+        <li><b>Print</b> gives the PO to send to the supplier, with delivery address, VAT, total in words and a "supplier conforme" signature line.</li>
       </ul>
     </div>
   </section>
@@ -77,6 +78,7 @@
         <li>The product's <b>cost becomes the average</b> of the stock you had and the stock that arrived.</li>
         <li>The books record goods you owe for but have not been billed for yet ("Goods received not invoiced").</li>
         <li>Each line shows <b>Not billed</b> until a supplier bill covers it.</li>
+        <li><b>Print</b> gives the receiving report for the warehouse file: ordered vs received, with delivered / received / checked signatures.</li>
       </ul>
       <div class="example">Example: 10 drums on hand at ₱100 + 5 arrive at ₱130 → 15 drums at <b>₱110</b> each.</div>
     </div>
@@ -93,6 +95,7 @@
         <li>The supplier's invoice number is required and <b>cannot be entered twice</b>.</li>
         <li>A bill with no payments can be <b>voided</b>; its goods can then be billed again.</li>
         <li>Opening payables: enter a bill with an expense line against Opening balance equity.</li>
+        <li><b>Print voucher</b> gives the accounts payable voucher, with the accounting entry and prepared / checked / approved lines.</li>
       </ul>
     </div>
   </section>
@@ -106,6 +109,7 @@
       <ul>
         <li>Withholding tax is worked out for you and kept for the BIR.</li>
         <li>Cash leaves the cash book, and what you owe goes down by the full amount (cash + withholding).</li>
+        <li><b>Print voucher</b> gives the check (or disbursement) voucher: bills paid, withholding, amount in words, the entry, and a "received payment by" line.</li>
       </ul>
       <div class="example">Example: bill of ₱3,472 (₱3,100 + ₱372 VAT) at 1% EWT → <b>₱31 withheld</b>, <b>₱3,441 paid</b> by check.</div>
     </div>
@@ -164,7 +168,6 @@
   <div class="ideas">
     <div class="idea"><h3>Purchase requests <span class="tag new">New</span></h3><p>Staff ask for items; purchasing turns approved requests into POs.</p></div>
     <div class="idea"><h3>PO approval by amount <span class="tag planned">Planned</span></h3><p>Orders over a limit wait for a manager.</p></div>
-    <div class="idea"><h3>Printed PO, receiving report, check voucher <span class="tag planned">Planned</span></h3><p>With your logo and colours from the Branding page.</p></div>
     <div class="idea"><h3>Form 2307 printing <span class="tag planned">Planned</span></h3><p>Print the withholding certificate straight from a payment.</p></div>
     <div class="idea"><h3>Reorder suggestions <span class="tag new">New</span></h3><p>Products below their reorder level become a draft PO in one click.</p></div>
     <div class="idea"><h3>Supplier price history <span class="tag new">New</span></h3><p>Last price paid per product, with a warning when a PO price jumps.</p></div>

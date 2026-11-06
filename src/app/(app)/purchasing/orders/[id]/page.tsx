@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PrintButton } from "@/components/print/print-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LinkButton } from "@/components/ui/button";
@@ -55,6 +56,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         description={order.closedAt ? `${PO_STATUS_LABELS[order.status]} ${formatDateTime(order.closedAt)}.` : undefined}
         actions={
           <>
+            <PrintButton href={`/print/purchase-order/${id}`} />
             {can(user, P.billsPost) && order.receipts.length > 0 && (
               <LinkButton href={`/purchasing/bills/new?supplierId=${order.supplierId}&branchId=${order.branchId}`} variant="secondary">
                 Bill received goods

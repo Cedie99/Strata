@@ -7,6 +7,9 @@ export const SETTING_DEFAULTS = {
   "company.name": "My Company",
   "company.currency": "PHP",
   "company.address": "",
+  "company.tin": "",
+  "company.phone": "",
+  "company.email": "",
 } as const;
 
 export type SettingKey = keyof typeof SETTING_DEFAULTS;

@@ -1,0 +1,147 @@
+/*
+ * Printed documents. Paper is always white with dark ink, whatever the screen theme; the brand appears
+ * through the logo, the brand typefaces (--font-brand / --font-sans) and the title-bar colour (--header).
+ * On screen the page is shown as a sheet on a grey desk with a toolbar; in print only the sheet remains.
+ */
+.print-desk {
+  --ink: #111614;
+  --ink-soft: #4b5550;
+  --rule: #c9d0cc;
+  --rule-soft: #e3e8e5;
+  --tint: #f3f6f4;
+  min-height: 100vh;
+  background: #d9dedb;
+  color: var(--ink);
+  color-scheme: light;
+  padding-block: 0 40px;
+}
+
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px max(16px, env(safe-area-inset-left, 0px));
+  background: #0a0c0b;
+  color: #fff;
+  font-size: 13px;
+}
+.print-toolbar .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.print-toolbar button, .print-toolbar select, .print-toolbar a {
+  border: 1px solid #3a4640;
+  background: #151a17;
+  color: #fff;
+  padding: 5px 12px;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.print-toolbar .primary { background: var(--header); border-color: var(--header); color: var(--header-text); font-weight: 700; }
+.print-toolbar button:focus-visible, .print-toolbar select:focus-visible, .print-toolbar a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.sheet {
+  box-sizing: border-box;
+  width: 210mm;
+  min-height: 297mm;
+  max-width: calc(100vw - 32px);
+  margin: 24px auto 0;
+  padding: 14mm 14mm 12mm;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 10.5pt;
+  line-height: 1.4;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.18);
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow-x: auto;
+}
+html[data-paper="letter"] .sheet { width: 8.5in; min-height: 11in; }
+html[data-paper="legal"] .sheet { width: 8.5in; min-height: 13in; }
+
+/* Letterhead */
+.lh { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 10px; border-bottom: 3px solid var(--header); }
+.lh-company { display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.lh-logo { height: 52px; width: auto; max-width: 180px; object-fit: contain; flex: none; }
+.lh-name { font-family: var(--font-brand); font-size: 15pt; line-height: 1.15; margin: 0 0 3px; letter-spacing: .02em; }
+.lh-lines { font-size: 8.5pt; color: var(--ink-soft); white-space: pre-line; }
+.lh-doc { text-align: right; flex: none; }
+.lh-title { font-family: var(--font-brand); font-size: 14pt; letter-spacing: .08em; text-transform: uppercase; margin: 0; color: var(--header); }
+.lh-number { font-family: var(--font-mono); font-size: 11pt; font-weight: 600; margin-top: 4px; }
+.lh-sub { font-size: 8.5pt; color: var(--ink-soft); margin-top: 2px; }
+.stamp { display: inline-block; margin-top: 6px; border: 1.5px solid currentColor; padding: 1px 8px; font-size: 8pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.stamp.void { color: #b42318; }
+.stamp.copy { color: var(--ink-soft); }
+
+/* Parties and facts */
+.facts { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 10px 24px; margin-top: 12px; }
+.party { border: 1px solid var(--rule); padding: 8px 10px; }
+.party h3, .meta dt { font-size: 7.5pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
+.party .who { font-weight: 700; font-size: 11pt; margin-top: 2px; }
+.party .lines { font-size: 9pt; color: var(--ink-soft); white-space: pre-line; }
+.meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; align-content: start; }
+.meta dd { margin: 1px 0 0; font-weight: 600; }
+
+/* Line tables */
+.lines-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 9.5pt; }
+.lines-table th { text-align: left; font-size: 7.5pt; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700;
+  border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 5px 6px; }
+.lines-table td { padding: 5px 6px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+.lines-table .r { text-align: right; white-space: nowrap; }
+.lines-table .mono { font-family: var(--font-mono); font-size: 8.5pt; }
+.lines-table .muted { color: var(--ink-soft); }
+.lines-table tfoot td { border-bottom: 0; border-top: 1px solid var(--ink); font-weight: 700; }
+.lines-table tr { break-inside: avoid; }
+.lines-table thead { display: table-header-group; }
+
+/* Totals and words */
+.bottom { display: grid; grid-template-columns: minmax(0, 1fr) 72mm; gap: 18px; margin-top: 10px; align-items: start; }
+.totals { width: 100%; border-collapse: collapse; font-size: 10pt; }
+.totals td { padding: 3px 6px; }
+.totals td:last-child { text-align: right; white-space: nowrap; }
+.totals .grand td { border-top: 1.5px solid var(--ink); border-bottom: 3px double var(--ink); font-weight: 800; font-size: 11pt; padding-block: 5px; }
+.words { border: 1px solid var(--rule); background: var(--tint); padding: 8px 10px; font-size: 9.5pt; }
+.words b { display: block; font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+.note { font-size: 9pt; color: var(--ink-soft); white-space: pre-line; margin-top: 10px; }
+
+/* Signatures */
+.signs { display: grid; grid-template-columns: repeat(var(--signs, 3), minmax(0, 1fr)); gap: 18px; margin-top: 34px; break-inside: avoid; }
+.sign { text-align: center; font-size: 8.5pt; }
+.sign .name { min-height: 16px; font-weight: 600; font-size: 9.5pt; border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+.sign .role { margin-top: 3px; color: var(--ink-soft); letter-spacing: .06em; text-transform: uppercase; font-size: 7.5pt; }
+
+.doc-foot { margin-top: 18px; padding-top: 6px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 18px; font-size: 7.5pt; color: var(--ink-soft); }
+.disclaimer { font-weight: 700; color: var(--ink); }
+
+.section-title { margin: 16px 0 0; font-size: 8pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.aging { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--rule); margin-top: 8px; }
+.aging div { padding: 6px 8px; border-right: 1px solid var(--rule); }
+.aging div:last-child { border-right: 0; }
+.aging span { display: block; font-size: 7.5pt; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+.aging b { font-size: 10pt; }
+
+@media print {
+  .print-desk { background: #fff; padding: 0; min-height: 0; }
+  .print-toolbar { display: none; }
+  .sheet { width: auto; min-height: 0; max-width: none; margin: 0; padding: 0; box-shadow: none; overflow: visible; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (max-width: 700px) {
+  .facts, .bottom { grid-template-columns: 1fr; }
+  .sheet { padding: 16px; }
+}
+
+/* Paper and page numbers (Edge and Chrome print the margin boxes). The toolbar overrides `size`. */
+@page {
+  size: A4;
+  margin: 12mm 12mm 14mm;
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 7.5pt;
+    color: #4b5550;
+  }
+}

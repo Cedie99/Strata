@@ -13,7 +13,7 @@ table below, so keep each row in the same `| Name | source | link | code |` shap
 
 | Page | Source | Published link | Covers this code |
 |---|---|---|---|
-| Start here (system map, screen layout, lists, global rules) | `index.html` | https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R | `src/app/(app)/layout.tsx`, `menu-bar.tsx`, `src/app/(app)/page.tsx`, `src/components/ui/data-grid.tsx`, `src/modules/registry.ts`, anything that adds a module or changes how modules feed each other |
+| Start here (system map, screen layout, lists, global rules) | `index.html` | https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R | `src/app/(app)/layout.tsx`, `menu-bar.tsx`, `src/app/(app)/page.tsx`, `src/components/ui/data-grid.tsx`, `src/modules/registry.ts`, `src/app/print/` and `src/components/print/` (printing section), anything that adds a module or changes how modules feed each other |
 | Inventory | `inventory.html` | https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL | `src/modules/inventory/`, `src/app/(app)/inventory/`, `src/modules/importers.ts` |
 | Sales | `sales.html` | https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S | `src/modules/sales/`, `src/app/(app)/sales/` |
 | Purchasing | `purchasing.html` | https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu | `src/modules/purchasing/`, `src/app/(app)/purchasing/` |

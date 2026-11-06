@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PrintButton } from "@/components/print/print-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LinkButton } from "@/components/ui/button";
@@ -43,12 +44,14 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
       <PageHeader
         title={`${receipt.number} · ${receipt.supplier.name}`}
         actions={
-          unbilled &&
-          can(user, P.billsPost) && (
-            <LinkButton href={`/purchasing/bills/new?supplierId=${receipt.supplierId}&branchId=${receipt.branchId}`} variant="secondary">
-              Bill these goods
-            </LinkButton>
-          )
+          <>
+            <PrintButton href={`/print/receiving-report/${id}`} />
+            {unbilled && can(user, P.billsPost) && (
+              <LinkButton href={`/purchasing/bills/new?supplierId=${receipt.supplierId}&branchId=${receipt.branchId}`} variant="secondary">
+                Bill these goods
+              </LinkButton>
+            )}
+          </>
         }
       />
       <Tabs tabs={listTabs("/purchasing/receipts", true)} />

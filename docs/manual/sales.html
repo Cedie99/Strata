@@ -46,6 +46,7 @@
       <ul>
         <li>The customer page shows what they <b>owe</b>, how much is <b>overdue</b>, and all their invoices with balances.</li>
         <li>"New invoice" on the customer page starts an invoice with that customer filled in.</li>
+        <li><b>Statement of account</b> on the customer page prints every open invoice with days overdue, an aging summary and the total due.</li>
       </ul>
     </div>
   </section>
@@ -61,6 +62,7 @@
         <li>Posting <b>issues the stock</b> and records each product's cost at that moment, so the margin on the invoice never changes later.</li>
         <li>The due date defaults to the invoice date plus the customer's terms.</li>
         <li>An invoice with no payments can be <b>voided</b>: the stock comes back and it stops counting as revenue. The number is kept.</li>
+        <li><b>Print</b> gives an internal copy with your letterhead, amount in words and a "received in good order" signature line, useful as a delivery copy.</li>
       </ul>
       <div class="example">Example: 5 drums at ₱150, cost ₱110 each → total ₱750, cost of goods ₱550, gross profit ₱200 (26.7%).</div>
     </div>
@@ -74,6 +76,7 @@
       <p>Amount, date, method (cash, check, bank transfer, card, other) and a reference such as the check number. Partial payments are fine; you can never record more than is still owed.</p>
       <ul>
         <li>Each payment gets a number like <span class="mono">PAY-MNL-2026-000001</span> and shows in the cash book as cash in.</li>
+        <li>In the invoice's Payments table, <b>Print</b> on a payment gives an acknowledgment receipt with the amount in words.</li>
       </ul>
     </div>
   </section>
@@ -124,7 +127,7 @@
       <ol>
         <li>Sales → Receivables → Filters → Age.</li>
         <li>Export the list for collection calls.</li>
-        <li>Open a customer for their full balance.</li>
+        <li>Open a customer and click <b>Statement of account</b>; print it or save it as a PDF to send.</li>
       </ol>
     </div>
   </div>

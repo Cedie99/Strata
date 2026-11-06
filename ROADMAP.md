@@ -33,12 +33,14 @@ BIR rules), sold first as one installation per client.
 - [ ] Form 2307 printing for suppliers
 - [ ] Readiness for BIR CAS/CBA registration: no gaps in series, no deletes, system documentation, audit trail export
 
-**3. Branded printed / PDF documents** (uses the Branding page)
-- [ ] Print layout with company logo, name, address, TIN and brand colours
-- [ ] Sales invoice, payment receipt, statement of account
-- [ ] Purchase order, receiving report, supplier bill voucher, payment voucher (check voucher)
-- [ ] Stock movement / delivery receipt, journal voucher
-- [ ] "Print / Save as PDF" button on every document page
+**3. Branded printed / PDF documents** (uses the Branding page) — built 2026-11-06
+- [x] Print layout with company logo, name, address, TIN and brand colours; A4 / Letter / Legal; page numbers;
+      amount in words; signature lines; "printed by" footer (2026-11-06)
+- [x] Sales invoice, payment receipt, statement of account (2026-11-06) — marked "Internal copy, not a BIR-registered invoice"
+- [x] Purchase order, receiving report, AP voucher, check / disbursement voucher (2026-11-06)
+- [x] Stock movement slip (receipt, issue, adjustment, transfer), journal voucher (2026-11-06)
+- [x] "Print / Save as PDF" on every document page (2026-11-06)
+- [ ] Print payment receipt, AP voucher and check voucher once real ones exist, and sign off the layouts on paper
 
 **4. Configurable approval workflows**
 - [ ] Approval rules per document type: who approves, amount thresholds, one or more levels in order

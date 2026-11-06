@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { PrintButton } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -47,12 +48,14 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
       <PageHeader
         title={`${customer.code} · ${customer.name}`}
         actions={
-          can(user, P.invoicesPost) &&
-          customer.isActive && (
-            <LinkButton href={`/sales/invoices/new?customerId=${id}`} variant="secondary">
-              New invoice
-            </LinkButton>
-          )
+          <>
+            <PrintButton href={`/print/statement/${id}`} label="Statement of account" />
+            {can(user, P.invoicesPost) && customer.isActive && (
+              <LinkButton href={`/sales/invoices/new?customerId=${id}`} variant="secondary">
+                New invoice
+              </LinkButton>
+            )}
+          </>
         }
       />
       <Tabs tabs={listTabs("/sales/customers", true)} />

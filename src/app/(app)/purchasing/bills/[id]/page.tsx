@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { PrintButton } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -73,7 +74,9 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
         title={`${bill.number} · ${bill.supplier.name}`}
         description={isVoid ? `Voided ${bill.voidedAt ? formatDateTime(bill.voidedAt) : ""}. Its received goods can be billed again.` : undefined}
         actions={
-          !isVoid && (
+          <>
+            <PrintButton href={`/print/ap-voucher/${id}`} label="Print voucher" />
+            {!isVoid && (
             <>
               {outstanding.greaterThan(0) && can(user, P.paymentsPost) && (
                 <LinkButton href={`/purchasing/payments/new?supplierId=${bill.supplierId}&billId=${id}`} variant="secondary">
@@ -86,7 +89,8 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
                 </ConfirmAction>
               )}
             </>
-          )
+            )}
+          </>
         }
       />
       <Tabs tabs={listTabs("/purchasing/bills", true)} />

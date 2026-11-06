@@ -429,6 +429,7 @@ export async function movementList(query: GridQuery, { all }: Opts = {}): Promis
     ],
     rows: movements.map((m) => ({
       id: m.id,
+      href: m.number ? `/print/movement/${encodeURIComponent(m.number)}` : undefined,
       cells: {
         when: dateCell(m.createdAt, formatDateTime),
         number: m.number || "-",

@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { PrintButton } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,7 +40,7 @@ export default async function JournalPage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <PageHeader title={`${entry.number}`} description={entry.memo} />
+      <PageHeader title={`${entry.number}`} description={entry.memo} actions={<PrintButton href={`/print/journal-voucher/${id}`} label="Print voucher" />} />
       <Tabs tabs={listTabs("/accounting/journals", true)} />
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <DataTable>

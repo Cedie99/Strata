@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { PrintButton, PrintLink } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -70,7 +71,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         title={`${invoice.number} · ${invoice.customer.name}`}
         description={isVoid ? `Voided ${invoice.voidedAt ? formatDateTime(invoice.voidedAt) : ""}. Its stock was received back.` : undefined}
         actions={
-          !isVoid && invoice.payments.length === 0 && can(user, P.invoicesPost) && <VoidInvoiceButton action={cancelInvoice.bind(null, id)} number={invoice.number} />
+          <>
+            <PrintButton href={`/print/sales-invoice/${id}`} />
+            {!isVoid && invoice.payments.length === 0 && can(user, P.invoicesPost) && <VoidInvoiceButton action={cancelInvoice.bind(null, id)} number={invoice.number} />}
+          </>
         }
       />
       <Tabs tabs={listTabs("/sales/invoices", true)} />
@@ -174,10 +178,11 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
             <th>Reference</th>
             <th>By</th>
             <th className="text-right">Amount</th>
+            <th />
           </tr>
         </thead>
         <tbody>
-          {invoice.payments.length === 0 && <EmptyRow colSpan={6}>No payments yet.</EmptyRow>}
+          {invoice.payments.length === 0 && <EmptyRow colSpan={7}>No payments yet.</EmptyRow>}
           {invoice.payments.map((p) => (
             <tr key={p.id}>
               <td>{formatDate(p.date)}</td>
@@ -186,6 +191,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <td>{p.reference || "-"}</td>
               <td>{p.createdBy?.name ?? "-"}</td>
               <td className="text-right tabular-nums">{money(p.amount)}</td>
+              <td className="text-right">
+                <PrintLink href={`/print/payment/${p.id}`} />
+              </td>
             </tr>
           ))}
         </tbody>

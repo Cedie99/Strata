@@ -173,6 +173,22 @@ Code: `src/modules/purchasing/` (posting rules in `posting.ts`), pages under `sr
 - **Check script**: `npx tsx --conditions=react-server prisma/purchasing-check.ts` runs the whole cycle against the
   database inside one transaction and rolls it back (nothing is saved); 25 checks of costs, VAT, EWT and balances.
 
+## Printed documents
+
+Every document has a printable page under `/print/…` (opened in a new tab by the **Print** button on the
+document): sales invoice, payment receipt, statement of account, purchase order, receiving report, AP voucher,
+check voucher, stock movement slip (rows of Inventory → Movements open it) and journal voucher.
+
+- Shared frame: `src/components/print/document.tsx` (letterhead from Company settings + Branding, facts,
+  signatures, footer); styles in `src/app/print/print.css`; toolbar with paper size (A4, Letter, Legal,
+  remembered per computer) and **Print / Save as PDF** (the browser's print dialog).
+- Paper is always white; the brand shows through the logo, typefaces and title-bar colour. Page numbers come
+  from `@page` margin boxes (Edge / Chrome).
+- Amounts in words: `src/core/words.ts` ("… Pesos and 50/100 Only").
+- Sales documents carry "Internal copy" and a note that they are not BIR-registered invoices or receipts, since
+  Strata is not CAS-registered yet.
+- Each print page checks the same permission and branch access as the document page.
+
 ## Custom modules (no code)
 
 Administrators with **Build and change custom modules** can create modules under
