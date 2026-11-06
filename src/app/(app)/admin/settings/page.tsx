@@ -34,8 +34,9 @@ export default async function SettingsPage() {
             required
           />
           <TextAreaField name="company.address" label="Registered address" defaultValue={settings["company.address"]} />
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-4">
             <TextField name="company.tin" label="TIN" defaultValue={settings["company.tin"]} placeholder="123-456-789-00000" />
+            <TextField name="company.rdo" label="RDO code" defaultValue={settings["company.rdo"]} placeholder="050" hint="For the BIR export files" />
             <TextField name="company.phone" label="Phone" defaultValue={settings["company.phone"]} />
             <TextField name="company.email" label="Email" type="email" defaultValue={settings["company.email"]} />
           </div>

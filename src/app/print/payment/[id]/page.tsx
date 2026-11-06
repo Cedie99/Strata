@@ -35,6 +35,7 @@ export default async function PrintPayment({ params }: Props) {
   const inv = payment.invoice;
   // Balance right after this payment (payments up to and including this one).
   const paidThrough = inv.payments.filter((p) => p.createdAt <= payment.createdAt).reduce((s, p) => s.plus(p.amount), new Prisma.Decimal(0));
+  const cash = payment.amount.minus(payment.cwt);
   const method = PAYMENT_METHODS.find((m) => m.value === payment.method)?.label ?? payment.method;
 
   return (
@@ -75,10 +76,21 @@ export default async function PrintPayment({ params }: Props) {
       </table>
       <div className="bottom">
         <div>
-          <Words>{amountInWords(payment.amount, currency)}</Words>
+          <Words>{amountInWords(cash, currency)}</Words>
+          {payment.cwt.greaterThan(0) && <p className="note">Tax withheld to be covered by the customer&rsquo;s BIR Form 2307.</p>}
           {payment.note && <p className="note">{payment.note}</p>}
         </div>
-        <Totals rows={[{ label: "Amount received", value: money(payment.amount), grand: true }]} />
+        <Totals
+          rows={
+            payment.cwt.isZero()
+              ? [{ label: "Amount received", value: money(cash), grand: true }]
+              : [
+                  { label: "Applied to invoice", value: money(payment.amount) },
+                  { label: `Less tax withheld${payment.atc ? ` (${payment.atc})` : ""}`, value: money(payment.cwt) },
+                  { label: "Cash received", value: money(cash), grand: true },
+                ]
+          }
+        />
       </div>
     </PrintDocument>
   );

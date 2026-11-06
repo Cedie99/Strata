@@ -17,6 +17,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd" aria-current="page">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
   </div>
@@ -44,7 +45,7 @@
       <div class="menu">Finance → Business dashboard</div>
       <p>The state of the business on one page, compared with the previous period. Pick the period: this month, last month, this quarter, this year or the last 12 months. It follows the branch picker.</p>
       <ul>
-        <li><b>Sales</b>: revenue, gross profit and margin; top products and customers; sales by branch.</li>
+        <li><b>Sales</b>: revenue (net of VAT), gross profit and margin; top products and customers; sales by branch.</li>
         <li><b>Receivables</b>: what customers owe, by age, and the biggest debtors.</li>
         <li><b>Cash</b>: cash balance, money in and out, and 12 months of cash flow.</li>
         <li><b>Inventory</b>: stock value at cost and days of stock.</li>
@@ -62,7 +63,7 @@
         <table>
           <thead><tr><th>Direction</th><th>Categories you can enter</th><th>Added automatically</th></tr></thead>
           <tbody>
-            <tr><th>Cash in</th><td>Opening balance, Owner capital, Loan received, Other income</td><td>Customer payments (from Sales)</td></tr>
+            <tr><th>Cash in</th><td>Opening balance, Owner capital, Loan received, Other income</td><td>Customer payments (from Sales), net of tax they withheld</td></tr>
             <tr><th>Cash out</th><td>Payroll, Rent &amp; utilities, Taxes &amp; fees, Loan repayment, Owner drawings, Other expense, Supplier payment</td><td>Payments to suppliers (from Purchasing), net of withholding</td></tr>
           </tbody>
         </table>
@@ -139,9 +140,9 @@
     <table>
       <thead><tr><th>Document</th><th>Entry</th></tr></thead>
       <tbody>
-        <tr><th>Sales invoice</th><td>Dr Receivable / Cr Sales; Dr Cost of goods sold / Cr Inventory</td></tr>
+        <tr><th>Sales invoice</th><td>Dr Receivable (total) / Cr Sales (net) + Cr Output VAT; Dr Cost of goods sold / Cr Inventory</td></tr>
         <tr><th>Invoice void</th><td>Reverses the invoice's entry on the invoice date</td></tr>
-        <tr><th>Payment received</th><td>Dr Cash / Cr Receivable</td></tr>
+        <tr><th>Payment received</th><td>Dr Cash (amount − tax withheld) + Dr Creditable withholding tax / Cr Receivable</td></tr>
         <tr><th>Receiving report</th><td>Dr Inventory / Cr Goods received not invoiced (plus revaluation to the new average cost)</td></tr>
         <tr><th>Supplier bill</th><td>Dr Goods received not invoiced or expense + Dr Input VAT / Cr Payables</td></tr>
         <tr><th>Payment made</th><td>Dr Payables / Cr Cash (net) + Cr Withholding taxes payable</td></tr>
@@ -153,7 +154,7 @@
   </div>
 
   <h2 id="close">Month-end, step by step</h2>
-  <p class="sub">A simple routine that keeps the books ready for the BIR.</p>
+  <p class="sub">A simple routine that keeps the books ready for the BIR. The BIR books and returns are under the <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a> menu.</p>
   <div class="howtos">
     <div class="howto">
       <h3>Before closing</h3>
@@ -180,6 +181,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Revenue, receivables, cash in</span></a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Payables, input VAT, withholding</span></a>
     <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL"><b>Inventory</b><span>Stock value and adjustments</span></a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq"><b>BIR</b><span>Books of accounts, VAT and withholding returns</span></a>
   </div>
 
   <footer>Strata ERP user manual · Finance &amp; Accounting · updated November 6, 2026.</footer>

@@ -32,6 +32,12 @@ export default async function PrintSalesInvoice({ params }: Props) {
   const currency = settings["company.currency"];
   const money = (v: Prisma.Decimal) => formatMoney(v, currency);
   const paid = inv.payments.reduce((s, p) => s.plus(p.amount), new Prisma.Decimal(0));
+  // The VAT breakdown BIR asks for on invoices: VATable, zero-rated and exempt sales, then the VAT.
+  const byCode = (code: string) => inv.lines.filter((l) => l.vatCode === code).reduce((s, l) => s.plus(l.amount), new Prisma.Decimal(0));
+  const vatable = byCode("VAT");
+  const zero = byCode("ZERO");
+  const exempt = byCode("EXEMPT");
+  const optional = (label: string, v: Prisma.Decimal) => (v.isZero() ? [] : [{ label, value: money(v) }]);
 
   return (
     <PrintDocument
@@ -39,7 +45,7 @@ export default async function PrintSalesInvoice({ params }: Props) {
       number={inv.number}
       status={inv.status === "VOID" ? "Void" : undefined}
       copyLabel="Internal copy"
-      party={{ label: "Sold to", name: inv.customer.name, lines: [inv.customer.address, [inv.customer.phone, inv.customer.email].filter(Boolean).join(" · ")] }}
+      party={{ label: "Sold to", name: inv.customer.name, lines: [inv.customer.address, [inv.customer.tin && `TIN ${inv.customer.tin}`, inv.customer.phone, inv.customer.email].filter(Boolean).join(" · ")] }}
       facts={[
         { label: "Invoice date", value: formatDate(inv.date) },
         { label: "Due date", value: formatDate(inv.dueDate) },
@@ -60,6 +66,7 @@ export default async function PrintSalesInvoice({ params }: Props) {
             <th className="r">Qty</th>
             <th>Unit</th>
             <th className="r">Unit price</th>
+            <th>VAT</th>
             <th className="r">Amount</th>
           </tr>
         </thead>
@@ -73,6 +80,7 @@ export default async function PrintSalesInvoice({ params }: Props) {
               <td className="r">{formatQty(l.qty)}</td>
               <td>{l.product.unit}</td>
               <td className="r">{money(l.unitPrice)}</td>
+              <td className="muted">{l.vatCode === "VAT" ? "V" : l.vatCode === "ZERO" ? "Z" : "E"}</td>
               <td className="r">{money(l.amount)}</td>
             </tr>
           ))}
@@ -85,7 +93,11 @@ export default async function PrintSalesInvoice({ params }: Props) {
         </div>
         <Totals
           rows={[
-            { label: "Total", value: money(inv.total), grand: true },
+            ...optional("VATable sales", vatable),
+            ...optional("Zero-rated sales", zero),
+            ...optional("VAT-exempt sales", exempt),
+            { label: "VAT 12%", value: money(inv.vat) },
+            { label: "Total amount due", value: money(inv.total), grand: true },
             ...(paid.greaterThan(0) ? [{ label: "Paid", value: money(paid) }, { label: "Balance due", value: money(inv.total.minus(paid)) }] : []),
           ]}
         />

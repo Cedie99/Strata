@@ -6,7 +6,6 @@ import { assertPeriodOpen, PostingError } from "@/core/posting";
 import { CONTROL_ACCOUNTS } from "@/modules/accounting/module";
 import { journalForCostChange, postJournal, reverseJournal, today, type LineInput } from "@/modules/accounting/ledger";
 import { recordMovement } from "@/modules/inventory/posting";
-import { VAT_RATE } from "./module";
 import type { BillInput, OrderInput, ReceiptInput, SupplierPaymentInput } from "./schemas";
 
 // The write side of purchasing. Each function runs inside the caller's posting transaction (runPosting)
@@ -27,7 +26,8 @@ const sum = <T>(rows: T[], get: (r: T) => Prisma.Decimal) => rows.reduce((s, r) 
 const addDays = (d: Date, days: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + days);
 
 /** Input VAT of a net amount. A non-VAT supplier never charges VAT, whatever the line says. */
-export const vatOf = (net: Prisma.Decimal, vatCode: string) => (vatCode === "VAT" ? money(net.times(VAT_RATE)) : ZERO);
+import { vatOf } from "@/core/tax-math";
+export { vatOf };
 const effectiveCode = (vatCode: string, vatRegistered: boolean) => (vatRegistered ? vatCode : "EXEMPT");
 
 /** Rows are locked until the transaction ends, so two people cannot receive, bill or pay the same thing at once. */

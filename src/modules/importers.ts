@@ -191,6 +191,10 @@ export async function getImporter(path: string[]): Promise<Importer> {
         { key: "phone", label: "Phone" },
         { key: "address", label: "Address" },
         { key: "termsDays", label: "Terms (days)", hint: "Blank = 30", sample: "30" },
+        { key: "tin", label: "TIN", sample: "123-456-789-00000" },
+        { key: "vatCode", label: "VAT", hint: "VAT, ZERO or EXEMPT; blank = VAT", sample: "VAT" },
+        { key: "cwtRate", label: "Withholds (%)", hint: "Percent the customer withholds (Form 2307); blank = 0", sample: "1" },
+        { key: "cwtAtc", label: "Withholding ATC", hint: "e.g. WC158", sample: "WC158" },
         activeColumn,
       ],
       async run(rows, tx, userId) {
@@ -198,7 +202,12 @@ export async function getImporter(path: string[]): Promise<Importer> {
         let created = 0;
         let updated = 0;
         for (const { rowNumber, values } of rows) {
-          const parsed = customerSchema.safeParse({ ...values, termsDays: values.termsDays || "30", isActive: yesNo(values.active) });
+          const parsed = customerSchema.safeParse({
+            ...values,
+            termsDays: values.termsDays || "30",
+            vatCode: (values.vatCode || "VAT").toUpperCase(),
+            isActive: yesNo(values.active),
+          });
           if (!parsed.success) {
             errors.push(...zodErrors(rowNumber, parsed.error));
             continue;

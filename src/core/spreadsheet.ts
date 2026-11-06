@@ -17,6 +17,33 @@ export async function buildWorkbook(sheetName: string, headers: string[], rows: 
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
+/**
+ * A report with several tables on one sheet: a title block, then each table with its own bold header
+ * and totals row, separated by a blank row. Used by the BIR books and worksheets.
+ */
+export async function buildReportWorkbook(
+  sheetName: string,
+  heading: string[],
+  sections: { title?: string; headers: string[]; rows: SheetValue[][]; totals?: SheetValue[] }[],
+) {
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet(sheetName.slice(0, 31).replace(/[\\/?*[\]:]/g, " "));
+  heading.forEach((h, i) => (ws.addRow([h]).font = { bold: i === 0, size: i === 0 ? 13 : 11 }));
+  for (const s of sections) {
+    ws.addRow([]);
+    if (s.title) ws.addRow([s.title]).font = { bold: true };
+    ws.addRow(s.headers).font = { bold: true };
+    for (const row of s.rows) ws.addRow(row);
+    if (s.totals) ws.addRow(s.totals).font = { bold: true };
+  }
+  const all = sections.flatMap((s) => [s.headers, ...s.rows.slice(0, 500)]);
+  ws.columns.forEach((col, i) => {
+    const longest = Math.max(...all.map((r) => String(r[i] ?? "").length));
+    col.width = Math.min(Math.max(longest + 2, 8), 50);
+  });
+  return Buffer.from(await wb.xlsx.writeBuffer());
+}
+
 export function xlsxResponse(bytes: Buffer, fileBase: string) {
   const date = new Date().toISOString().slice(0, 10);
   const name = `${fileBase.replace(/[^\w.-]+/g, "_")}_${date}.xlsx`;

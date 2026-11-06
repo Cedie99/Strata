@@ -8,6 +8,7 @@ export const SETTING_DEFAULTS = {
   "company.currency": "PHP",
   "company.address": "",
   "company.tin": "",
+  "company.rdo": "", // BIR Revenue District Office code, used in the SLS / SLP / QAP / SAWT files
   "company.phone": "",
   "company.email": "",
 } as const;

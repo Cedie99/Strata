@@ -34,6 +34,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
   </div>
@@ -43,7 +44,7 @@
   <div class="toc"><span>On this page</span><a href="#map">System map</a><a href="#screen">The screen</a><a href="#lists">Lists and records</a><a href="#print">Printing</a><a href="#rules">Rules everywhere</a><a href="#pages">Manual pages</a></div>
 
   <h2 id="map">How the modules connect</h2>
-  <p class="sub">Goods flow left to right: bought in Purchasing, held in Inventory, sold in Sales. Every step posts to the general ledger by itself. Finance reads the results; Setup decides who can do what.</p>
+  <p class="sub">Goods flow left to right: bought in Purchasing, held in Inventory, sold in Sales. Every step posts to the general ledger by itself. Finance reads the results, BIR turns them into books and returns; Setup decides who can do what.</p>
   <div class="scroll">
     <svg class="map" viewBox="0 0 900 470" role="img" aria-labelledby="map-title">
       <title id="map-title">Strata module map: Setup governs all modules; goods flow from Purchasing to Inventory to Sales; all three post to Accounting; Finance reads Sales, Purchasing and the cash book.</title>
@@ -98,9 +99,9 @@
       <text class="s" x="40" y="387">trial balance, general ledger, manual journals, period close.</text>
 
       <rect class="box" x="660" y="322" width="220" height="72"/>
-      <text class="t" x="678" y="350">Finance</text>
-      <text class="s" x="678" y="371">Business dashboard,</text>
-      <text class="s" x="678" y="387">cash book</text>
+      <text class="t" x="678" y="350">Finance · BIR</text>
+      <text class="s" x="678" y="371">Dashboard, cash book;</text>
+      <text class="s" x="678" y="387">BIR books, VAT, 2307</text>
       <path class="ln" d="M622 358h34" marker-end="url(#a)"/>
 
       <text class="s" x="20" y="430">Solid yellow arrows: goods. Grey arrows: information that is posted automatically. Dashed: permissions.</text>
@@ -117,8 +118,8 @@
         <tr><th>Receive goods on a purchase order</th><td><span class="chip up">stock ↑</span> <span class="chip up">average cost</span></td><td>Inventory, goods received not invoiced</td><td>—</td></tr>
         <tr><th>Post a supplier bill</th><td>—</td><td>Input VAT, accounts payable</td><td>—</td></tr>
         <tr><th>Pay a supplier</th><td>—</td><td>Payables ↓, cash ↓, withholding tax payable</td><td><span class="chip down">cash out</span></td></tr>
-        <tr><th>Post a sales invoice</th><td><span class="chip down">stock ↓</span></td><td>Receivable, sales, cost of goods sold, inventory</td><td>Revenue, gross profit</td></tr>
-        <tr><th>Record a customer payment</th><td>—</td><td>Cash ↑, receivable ↓</td><td><span class="chip up">cash in</span></td></tr>
+        <tr><th>Post a sales invoice</th><td><span class="chip down">stock ↓</span></td><td>Receivable, sales, output VAT, cost of goods sold, inventory</td><td>Revenue, gross profit</td></tr>
+        <tr><th>Record a customer payment</th><td>—</td><td>Cash ↑, creditable withholding ↑, receivable ↓</td><td><span class="chip up">cash in</span></td></tr>
         <tr><th>Post a stock movement</th><td><span class="chip">stock ±</span></td><td>Inventory against adjustments (or opening equity)</td><td>Inventory value</td></tr>
         <tr><th>Enter a cash book line</th><td>—</td><td>Cash against the category's account</td><td><span class="chip">cash in / out</span></td></tr>
         <tr><th>Change a product's cost</th><td>—</td><td>Stock on hand revalued</td><td>Inventory value</td></tr>
@@ -143,7 +144,7 @@
     <div class="n">B</div>
     <div>
       <h3>Menu bar</h3>
-      <p>One menu per module: Inventory, Sales, Purchasing, Finance, Accounting, Setup, plus any custom modules. You only see the menus and items your role allows. Some items sit in a ► submenu.</p>
+      <p>One menu per module: Inventory, Sales, Purchasing, Finance, Accounting, BIR, Setup, plus any custom modules. You only see the menus and items your role allows. Some items sit in a ► submenu.</p>
     </div>
   </section>
   <section class="screen">
@@ -223,6 +224,7 @@
         <tr><th>Purchasing</th><td>Purchase order, receiving report, accounts payable voucher, check / disbursement voucher</td></tr>
         <tr><th>Inventory</th><td>Stock receipt, issue slip, adjustment, transfer slip</td></tr>
         <tr><th>Accounting</th><td>Journal voucher</td></tr>
+        <tr><th>BIR</th><td>Form 2307 for each supplier per quarter; every BIR book and worksheet exports to Excel</td></tr>
       </tbody>
     </table>
   </div>
@@ -246,6 +248,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Customers, invoices, payments received, receivables</span></a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Suppliers, POs, receiving, bills, payments, payables</span></a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Dashboard, cash book, ledger, statements, period close</span></a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq"><b>BIR</b><span>Books of accounts, SLS / SLP, 2550Q, 1601-EQ, SAWT, 2307, CAS</span></a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK"><b>Setup &amp; Security</b><span>Users, roles, branches, numbering, settings, branding, audit</span></a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW"><b>Custom modules</b><span>Build your own records and menus without code</span></a>
   </div>

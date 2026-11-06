@@ -9,6 +9,7 @@ import { getBranchScope } from "@/core/branches";
 import { db } from "@/core/db";
 import { formatDate, formatDateTime, formatMoney, formatQty, toDateInput } from "@/core/format";
 import { getSettings } from "@/core/settings";
+import { VAT_CODES } from "@/core/tax";
 import { P as ACC } from "@/modules/accounting/module";
 import { cancelInvoice } from "@/modules/sales/actions";
 import { P, PAYMENT_METHODS } from "@/modules/sales/module";
@@ -50,7 +51,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const money = (v: Prisma.Decimal) => formatMoney(v, currency);
   const paid = invoice.payments.reduce((s, p) => s.plus(p.amount), ZERO);
   const outstanding = invoice.total.minus(paid);
-  const grossProfit = invoice.total.minus(invoice.costTotal);
+  const grossProfit = invoice.subtotal.minus(invoice.costTotal);
+  const withheld = invoice.payments.reduce((s, p) => s.plus(p.cwt), ZERO);
+  const vatLabel = new Map<string, string>(VAT_CODES.map((c) => [c.value, c.label]));
   const isVoid = invoice.status === "VOID";
   const overdueDays = daysOverdue(invoice.dueDate, new Date());
   const methodLabel = new Map<string, string>(PAYMENT_METHODS.map((m) => [m.value, m.label]));
@@ -106,6 +109,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <th className="text-right">Qty</th>
                 <th className="text-right">Unit price</th>
                 <th className="text-right">Amount</th>
+                <th>VAT</th>
                 <th className="text-right">Unit cost</th>
                 <th className="text-right">Gross profit</th>
               </tr>
@@ -123,6 +127,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                     </td>
                     <td className="text-right tabular-nums">{money(l.unitPrice)}</td>
                     <td className="text-right tabular-nums">{money(l.amount)}</td>
+                    <td className="text-muted">
+                      {vatLabel.get(l.vatCode) ?? l.vatCode}
+                      {l.vat.greaterThan(0) && <span className="ml-1 tabular-nums">{money(l.vat)}</span>}
+                    </td>
                     <td className="text-right text-muted tabular-nums">{money(l.unitCost)}</td>
                     <td className={`text-right tabular-nums ${gp.isNegative() ? "text-danger" : ""}`}>{money(gp)}</td>
                   </tr>
@@ -135,20 +143,31 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         <div className="space-y-6">
           <Card title="Summary">
             <dl className="space-y-1.5">
+              <Row label="Net of VAT" value={money(invoice.subtotal)} />
+              <Row label="VAT" value={money(invoice.vat)} />
               <Row label="Total" value={money(invoice.total)} strong />
               <Row label="Cost of goods" value={money(invoice.costTotal)} />
               <Row
                 label="Gross profit"
-                value={`${money(grossProfit)} · ${invoice.total.isZero() ? "–" : `${grossProfit.div(invoice.total).times(100).toFixed(1)}%`}`}
+                value={`${money(grossProfit)} · ${invoice.subtotal.isZero() ? "–" : `${grossProfit.div(invoice.subtotal).times(100).toFixed(1)}%`}`}
               />
               <Row label="Paid" value={money(paid)} />
+              {withheld.greaterThan(0) && <Row label="of which tax withheld" value={money(withheld)} />}
               <Row label="Outstanding" value={isVoid ? "-" : money(outstanding)} strong />
               <Row label="Status" value={status} danger={!isVoid && outstanding.greaterThan(0) && overdueDays > 0} />
             </dl>
           </Card>
           {!isVoid && outstanding.greaterThan(0) && can(user, P.paymentsPost) && (
             <Card title="Record payment">
-              <PaymentForm invoiceId={id} outstanding={outstanding.toFixed(2)} today={toDateInput(new Date())} />
+              <PaymentForm
+                invoiceId={id}
+                outstanding={outstanding.toFixed(2)}
+                today={toDateInput(new Date())}
+                subtotal={Number(invoice.subtotal)}
+                total={Number(invoice.total)}
+                cwtRate={Number(invoice.customer.cwtRate)}
+                atc={invoice.customer.cwtAtc}
+              />
             </Card>
           )}
         </div>
@@ -177,12 +196,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
             <th>Method</th>
             <th>Reference</th>
             <th>By</th>
-            <th className="text-right">Amount</th>
+            <th className="text-right">Amount applied</th>
+            <th className="text-right">Tax withheld</th>
+            <th className="text-right">Cash</th>
             <th />
           </tr>
         </thead>
         <tbody>
-          {invoice.payments.length === 0 && <EmptyRow colSpan={7}>No payments yet.</EmptyRow>}
+          {invoice.payments.length === 0 && <EmptyRow colSpan={9}>No payments yet.</EmptyRow>}
           {invoice.payments.map((p) => (
             <tr key={p.id}>
               <td>{formatDate(p.date)}</td>
@@ -191,6 +212,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <td>{p.reference || "-"}</td>
               <td>{p.createdBy?.name ?? "-"}</td>
               <td className="text-right tabular-nums">{money(p.amount)}</td>
+              <td className="text-right tabular-nums">{p.cwt.isZero() ? "-" : `${money(p.cwt)}${p.atc ? ` · ${p.atc}` : ""}`}</td>
+              <td className="text-right tabular-nums">{money(p.amount.minus(p.cwt))}</td>
               <td className="text-right">
                 <PrintLink href={`/print/payment/${p.id}`} />
               </td>

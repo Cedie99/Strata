@@ -29,7 +29,7 @@ export default async function NewInvoicePage({ searchParams }: { searchParams: P
           customerId={customerId}
           today={toDateInput(new Date())}
           currency={settings["company.currency"]}
-          customers={customers.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+          customers={customers.map((c) => ({ value: c.id, label: `${c.name} (${c.code})`, vatCode: c.vatCode }))}
           warehouses={warehouses.map((w) => ({ value: w.id, label: `${w.code} · ${w.name} (${w.branch.code})` }))}
           products={products.map((p) => ({
             value: p.id,

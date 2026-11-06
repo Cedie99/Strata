@@ -13,10 +13,11 @@ with the documents behind them.
 | Module | What it covers |
 |---|---|
 | **Inventory** | Products, warehouses per branch, stock movements (receipt, issue, adjustment, transfer), stock on hand, moving-average cost |
-| **Sales** | Customers, sales invoices that issue stock and fix gross margin, payments received, receivables aging |
+| **Sales** | Customers, sales invoices with output VAT that issue stock and fix gross margin, payments received (with tax withheld by customers, Form 2307), receivables aging |
 | **Purchasing** | Suppliers, purchase orders, receiving reports, supplier bills with input VAT, payments with expanded withholding tax (EWT), payables aging |
 | **Finance** | Business dashboard (revenue, margins, receivables, cash flow, inventory) and cash book |
 | **Accounting** | Automatic journal entries, income statement, balance sheet, trial balance, general ledger, manual journals, month-end close |
+| **BIR** | Books of accounts, SLS / SLP with RELIEF data files, 2550Q, 1601-EQ / QAP and SAWT worksheets, Form 2307 for suppliers, CAS readiness checks |
 | **Setup** | Users, roles and permissions, branches, document numbering, company settings, branding, tamper-evident audit log |
 | **Custom modules** | New record types, forms, menus, rules and approvals built in the browser without code |
 
@@ -25,8 +26,9 @@ with the documents behind them.
 - **Books you can trust.** Posted documents are never edited or deleted; mistakes are voided or reversed. The
   database itself enforces balanced entries, closed periods and append-only records, and the audit log is
   hash-chained so tampering shows.
-- **Built for the Philippines.** VAT-registered by default (12%, zero-rated, exempt), EWT on supplier payments,
-  a Philippine chart of accounts, and a design kept ready for BIR CAS registration (gap-free numbering, full trail).
+- **Built for the Philippines.** VAT on sales and purchases (12%, zero-rated, exempt), EWT on supplier payments,
+  creditable withholding from customers, the BIR books, summary lists and return worksheets, Form 2307, and a
+  design kept ready for BIR CAS registration (gap-free numbering, full trail, live readiness checks).
 - **Multi-branch from the start.** Users see only their branches; every list, report and the dashboard can be
   narrowed to one branch.
 - **Yours to shape.** Rebrand it (name, logo, fonts, colours) and add your own modules without a developer.
@@ -118,8 +120,8 @@ src/components/ui/          buttons, form fields, tables, cards
   receivables with aging and top debtors, cash balance and 12-month cash flow, inventory value at cost and days of
   stock, top products and customers, sales by branch. It follows the branch picked in the title bar.
   Calculations live in `src/modules/finance/dashboard.ts`.
-- Figures: revenue = posted invoice totals (no VAT handling yet); gross profit = revenue − cost at posting;
-  cash = payments + cash in − cash out. Roles "Sales Clerk" and "Finance" are seeded as starting points.
+- Figures: revenue = posted invoice subtotals (net of VAT); gross profit = revenue − cost at posting;
+  cash = payments (net of tax withheld) + cash in − cash out. Roles "Sales Clerk" and "Finance" are seeded as starting points.
 
 ## Accounting: general ledger, statements and audit trail
 
@@ -147,8 +149,8 @@ src/components/ui/          buttons, form fields, tables, cards
   The chain is extended one transaction at a time, so audited writes are serialised.
 - Documents posted before the ledger existed are journalled by `npx tsx --conditions=react-server prisma/ledger-backfill.ts`
   (safe to re-run).
-- Strata keeps **internal records**: official BIR invoices still come from the registered system. Purchases carry VAT
-  and withholding (see Purchasing); sales VAT and BIR reports are next.
+- Strata keeps **internal records**: official BIR invoices still come from the registered system. Sales and purchases carry
+  VAT and withholding; see "BIR compliance" below.
 
 ## Purchasing and payables
 
@@ -172,6 +174,30 @@ Code: `src/modules/purchasing/` (posting rules in `posting.ts`), pages under `sr
   are append-only.
 - **Check script**: `npx tsx --conditions=react-server prisma/purchasing-check.ts` runs the whole cycle against the
   database inside one transaction and rolls it back (nothing is saved); 25 checks of costs, VAT, EWT and balances.
+
+## BIR compliance
+
+- **VAT on sales**: invoice lines are net of VAT, each with a VAT code (VATable 12%, zero-rated, exempt; default from
+  the customer). `SalesInvoice` keeps subtotal, vat and total (DB check: total = subtotal + vat). Ledger: Dr AR (total) /
+  Cr Sales (subtotal) + Cr Output VAT. Invoices from before this change are EXEMPT with no VAT (migration
+  `20261106150000_bir_compliance`).
+- **Creditable withholding received (Form 2307)**: a payment's amount is what the invoice is reduced by; `cwt` is the
+  part the customer withheld (suggested from the customer's rate on the net-of-VAT share). Ledger: Dr Cash
+  (amount − cwt) + Dr CWT / Cr AR. The cash book and dashboard count only the cash.
+- **BIR menu** (`tax.view`, granted by the migration to every role with `accounting.view`): general journal, general
+  ledger, cash receipts and disbursements books, sales and purchases books (date range); SLS, SLP, 2550Q, 1601-EQ /
+  QAP, SAWT and Form 2307 (quarter). Each report shows ✓ / ⚠ checks against the ledger and for missing TINs, and
+  exports to Excel with the company heading. SLS and SLP also download as BIR RELIEF .DAT files (needs the company
+  TIN and RDO code under Company settings; validate with the BIR module before submitting).
+- **Form 2307** prints per supplier and quarter at `/print/form-2307/<supplierId>?f_q=2026-Q4`.
+- **CAS readiness** (BIR → CAS readiness): live checks for gaps in every document series, the database triggers that
+  refuse edits and deletes, the audit chain and a balanced ledger; exports the audit trail with its hashes.
+- Code: `src/core/tax.ts` (codes, ATCs, quarters; safe for client forms), `src/core/tax-math.ts`,
+  `src/modules/tax/` (reports, catalog, export, CAS checks), pages under `src/app/(app)/tax/`.
+- Check: `npx tsx --conditions=react-server prisma/bir-check.ts` posts VAT invoices and payments with withholding in
+  one rolled-back transaction, then runs every BIR report read-only on the real data.
+- Not yet tracked: input VAT carried over, VAT on imports, capital goods, VAT withheld by government customers;
+  QAP and SAWT are Excel only.
 
 ## Printed documents
 

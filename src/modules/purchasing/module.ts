@@ -9,24 +9,8 @@ export const P = {
   paymentsPost: "purchasing.payments.post",
 } as const;
 
-/** VAT treatment of a purchase line. Amounts are entered net of VAT. */
-export const VAT_CODES = [
-  { value: "VAT", label: "VATable 12%" },
-  { value: "ZERO", label: "Zero-rated" },
-  { value: "EXEMPT", label: "Exempt / non-VAT" },
-] as const;
-export type VatCode = (typeof VAT_CODES)[number]["value"];
-export const VAT_RATE = 0.12;
-
-/** Common expanded withholding rates (percent) with their BIR ATC for corporations / individuals. */
-export const EWT_PRESETS = [
-  { value: "0", label: "None", atc: "" },
-  { value: "1", label: "1% · goods (top withholding agents)", atc: "WC158" },
-  { value: "2", label: "2% · services (top withholding agents)", atc: "WC160" },
-  { value: "5", label: "5% · rentals", atc: "WC100" },
-  { value: "10", label: "10% · professional fees", atc: "WC010" },
-  { value: "15", label: "15% · professional fees (over threshold)", atc: "WC011" },
-] as const;
+// VAT codes and withholding presets are shared with Sales; see src/core/tax.ts.
+export { VAT_CODES, VAT_RATE, WITHHOLDING_PRESETS as EWT_PRESETS, type VatCode } from "@/core/tax";
 
 export const PO_STATUS_LABELS: Record<string, string> = {
   OPEN: "Open",

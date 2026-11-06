@@ -7,7 +7,7 @@
   <div class="wrap">
     <p class="eyebrow">Strata ERP · User manual · Sales</p>
     <h1>Sell → Collect</h1>
-    <p class="lead">Sales turns stock into revenue and receivables, then into cash. One invoice issues the goods, records the sale and fixes its gross margin; payments clear what the customer owes.</p>
+    <p class="lead">Sales turns stock into revenue and receivables, then into cash. One invoice issues the goods, records the sale and its VAT and fixes its gross margin; payments clear what the customer owes, including any tax they withhold.</p>
   </div>
 </header>
 <nav class="pages" aria-label="Manual pages">
@@ -17,6 +17,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S" aria-current="page">Sales</a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
   </div>
@@ -29,8 +30,8 @@
   <p class="sub">Four steps. The chips show what changes when you save.</p>
   <ol class="chain" style="--steps: 4">
     <li><div class="doc">Customer</div><div class="q">Who are we selling to, on what terms?</div><div class="fx"><span class="chip none">master data</span></div></li>
-    <li><div class="doc">Sales invoice</div><div class="q">What did we sell, from where?</div><div class="fx"><span class="chip down">stock ↓</span><span class="chip up">revenue ↑</span><span class="chip up">receivable ↑</span></div></li>
-    <li><div class="doc">Payment received</div><div class="q">What did they pay?</div><div class="fx"><span class="chip up">cash ↑</span><span class="chip down">receivable ↓</span></div></li>
+    <li><div class="doc">Sales invoice</div><div class="q">What did we sell, from where?</div><div class="fx"><span class="chip down">stock ↓</span><span class="chip up">revenue ↑</span><span class="chip up">output VAT</span><span class="chip up">receivable ↑</span></div></li>
+    <li><div class="doc">Payment received</div><div class="q">What did they pay, and withhold?</div><div class="fx"><span class="chip up">cash ↑</span><span class="chip up">CWT · 2307</span><span class="chip down">receivable ↓</span></div></li>
     <li><div class="doc">Receivables</div><div class="q">Who still owes us, and how late?</div><div class="fx"><span class="chip none">list</span></div></li>
   </ol>
 
@@ -42,8 +43,11 @@
     <div>
       <h3>Customers</h3>
       <div class="menu">Sales → Customers</div>
-      <p>Code, name, email, phone, address and <b>payment terms</b> in days (0 = due on delivery). Untick Active to stop selling to a customer.</p>
+      <p>Code, name, email, phone, registered address, <b>TIN</b> and <b>payment terms</b> in days (0 = due on delivery). Untick Active to stop selling to a customer.</p>
       <ul>
+        <li><b>VAT on sales to them</b>: VATable 12%, zero-rated (e.g. PEZA, export) or exempt. New invoice lines start with it.</li>
+        <li><b>They withhold (%)</b> and <b>Withholding ATC</b>: if the customer deducts tax from payments and gives you Form 2307 (e.g. 1%, WC158), payments suggest that amount.</li>
+        <li>The TIN appears on printed invoices, the sales book, the SLS and the SAWT.</li>
         <li>The customer page shows what they <b>owe</b>, how much is <b>overdue</b>, and all their invoices with balances.</li>
         <li>"New invoice" on the customer page starts an invoice with that customer filled in.</li>
         <li><b>Statement of account</b> on the customer page prints every open invoice with days overdue, an aging summary and the total due.</li>
@@ -56,15 +60,16 @@
     <div>
       <h3>Invoices</h3>
       <div class="menu">Sales → Invoices → New</div>
-      <p>Choose the customer and the <b>warehouse the goods ship from</b> (it sets the invoice's branch), the date, an optional due date and reference (customer PO, DR number), then the lines: product, quantity and unit price.</p>
+      <p>Choose the customer and the <b>warehouse the goods ship from</b> (it sets the invoice's branch), the date, an optional due date and reference (customer PO, DR number, official invoice number), then the lines: product, quantity, unit price and <b>VAT</b>.</p>
       <ul>
-        <li>The price starts at the product's selling price. The form shows the <b>estimated gross profit</b> before you post.</li>
+        <li>Prices are <b>net of VAT</b>. Each line is VATable 12%, zero-rated or exempt; the form shows net, VAT 12% and total due.</li>
+        <li>The price starts at the product's selling price. The form shows the <b>estimated gross profit</b> (on the net amount) before you post.</li>
         <li>Posting <b>issues the stock</b> and records each product's cost at that moment, so the margin on the invoice never changes later.</li>
         <li>The due date defaults to the invoice date plus the customer's terms.</li>
         <li>An invoice with no payments can be <b>voided</b>: the stock comes back and it stops counting as revenue. The number is kept.</li>
-        <li><b>Print</b> gives an internal copy with your letterhead, amount in words and a "received in good order" signature line, useful as a delivery copy.</li>
+        <li><b>Print</b> gives an internal copy with your letterhead, the VAT breakdown (VATable, zero-rated, exempt sales, VAT), amount in words and a "received in good order" signature line.</li>
       </ul>
-      <div class="example">Example: 5 drums at ₱150, cost ₱110 each → total ₱750, cost of goods ₱550, gross profit ₱200 (26.7%).</div>
+      <div class="example">Example: 5 drums at ₱150 net, VATable, cost ₱110 each → net ₱750, VAT ₱90, total due ₱840; cost of goods ₱550, gross profit ₱200 (26.7% of net).</div>
     </div>
   </section>
 
@@ -73,10 +78,12 @@
     <div>
       <h3>Payments received</h3>
       <div class="menu">Open an invoice → Record payment · list under Sales → Payments received</div>
-      <p>Amount, date, method (cash, check, bank transfer, card, other) and a reference such as the check number. Partial payments are fine; you can never record more than is still owed.</p>
+      <p><b>Amount applied</b> (what the invoice goes down by), date, <b>tax withheld (2307)</b> and its ATC, method (cash, check, bank transfer, card, other) and a reference such as the check number. Partial payments are fine; you can never record more than is still owed.</p>
       <ul>
-        <li>Each payment gets a number like <span class="mono">PAY-MNL-2026-000001</span> and shows in the cash book as cash in.</li>
-        <li>In the invoice's Payments table, <b>Print</b> on a payment gives an acknowledgment receipt with the amount in words.</li>
+        <li>Tax withheld is suggested from the customer's rate on the net-of-VAT share of the amount; change it to what their Form 2307 says. The form shows the <b>cash received</b> = amount applied − tax withheld.</li>
+        <li>Tax withheld is not cash: it goes to <i>Creditable withholding tax</i> and appears on the SAWT. Keep the customer's Form 2307.</li>
+        <li>Each payment gets a number like <span class="mono">PAY-MNL-2026-000001</span> and shows in the cash book as cash in (the cash part only).</li>
+        <li>In the invoice's Payments table, <b>Print</b> on a payment gives an acknowledgment receipt: amount applied, less tax withheld, cash received in words.</li>
       </ul>
     </div>
   </section>
@@ -90,7 +97,7 @@
     </div>
   </section>
 
-  <div class="note"><b>VAT on sales is not in Strata yet.</b>Invoice totals are recorded as entered. Official BIR invoices still come from your registered system; record its invoice number in Reference. Sales VAT and customer withholding (Form 2307) are on the roadmap.</div>
+  <div class="note"><b>Official invoices.</b>Strata's printed invoices are internal copies until it is registered with the BIR; official invoices still come from your registered system. Record its invoice number in Reference. Invoices posted before VAT on sales was added count as exempt sales with no VAT. See <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a> for the sales book, SLS and SAWT.</div>
 
   <h2 id="howto">How to</h2>
   <p class="sub">The common jobs, step by step.</p>
@@ -108,7 +115,7 @@
       <h3>Record a payment</h3>
       <ol>
         <li>Open the invoice (from Invoices or Receivables).</li>
-        <li>In "Record payment", enter the amount, date and method.</li>
+        <li>In "Record payment", enter the amount applied, date and method; check the tax withheld.</li>
         <li>Add the check or transfer number in Reference.</li>
         <li>Record it. The balance and status update at once.</li>
       </ol>
@@ -139,8 +146,9 @@
       <thead><tr><th>Other module</th><th>Effect</th></tr></thead>
       <tbody>
         <tr><th>Inventory</th><td>One Issue movement per invoice line, referenced by the invoice number; a void receives it back.</td></tr>
-        <tr><th>Accounting</th><td>Invoice: receivable / sales, and cost of goods sold / inventory. Payment: cash / receivable. A void reverses the invoice's entry.</td></tr>
-        <tr><th>Finance</th><td>Revenue, gross profit and margin, receivables aging, top customers and products, sales by branch; payments count as cash in.</td></tr>
+        <tr><th>Accounting</th><td>Invoice: receivable / sales + output VAT, and cost of goods sold / inventory. Payment: cash + creditable withholding / receivable. A void reverses the invoice's entry.</td></tr>
+        <tr><th>Finance</th><td>Revenue (net of VAT), gross profit and margin, receivables aging, top customers and products, sales by branch; the cash part of payments counts as cash in.</td></tr>
+        <tr><th>BIR</th><td>Sales book, cash receipts book, SLS, 2550Q (output VAT) and SAWT (tax withheld by customers).</td></tr>
         <tr><th>Purchasing</th><td>The cost used for gross margin is the average cost built up by receiving purchase orders.</td></tr>
       </tbody>
     </table>
@@ -151,6 +159,7 @@
     <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL"><b>Inventory</b><span>Where the goods come from</span></a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Revenue, receivables and cash in the reports</span></a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>How product costs are set</span></a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq"><b>BIR</b><span>Sales book, SLS, 2550Q, SAWT</span></a>
   </div>
 
   <footer>Strata ERP user manual · Sales · updated November 6, 2026.</footer>

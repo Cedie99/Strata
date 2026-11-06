@@ -17,6 +17,7 @@ import { customerList, invoiceList, paymentList, receivablesList } from "@/modul
 import { P as SALES } from "@/modules/sales/module";
 import { billList, orderList, payablesList, receiptList, supplierList, supplierPaymentList } from "@/modules/purchasing/lists";
 import { P as PUR } from "@/modules/purchasing/module";
+import { birExport } from "@/modules/tax/export";
 
 // GET /export/<list>?q=…&letter=…&f_…  → the rows matching that search and those filters, as .xlsx
 // GET /export/<list>?template=1    → an empty import template for that list
@@ -101,6 +102,9 @@ async function load(path: string[], query: GridQuery): Promise<{ title: string; 
 export async function GET(request: Request, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
   const search = new URL(request.url).searchParams;
+
+  // BIR books, lists and worksheets have their own layout (several tables, company heading).
+  if (path[0] === "bir" && path.length === 2) return birExport(path[1], search);
 
   if (search.has("template")) {
     const importer = await getImporter(path);

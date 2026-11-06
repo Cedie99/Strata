@@ -10,6 +10,7 @@ import { hashPassword } from "@/core/auth/password";
 import { db } from "@/core/db";
 import { checkbox, formObject, fromZod, stringList, type ActionState } from "@/core/forms";
 import { getAllPermissions } from "@/modules/registry";
+import { tinString } from "@/modules/sales/schemas";
 import { P } from "./module";
 
 const isUniqueViolation = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
@@ -274,11 +275,11 @@ const settingsSchema = z.object({
     .toUpperCase()
     .regex(/^[A-Z]{3}$/, "Use a 3-letter currency code, e.g. PHP"),
   "company.address": z.string().trim().max(500).default(""),
-  "company.tin": z
+  "company.tin": tinString.default(""),
+  "company.rdo": z
     .string()
     .trim()
-    .max(20)
-    .refine((v) => v === "" || /^d{3}-?d{3}-?d{3}(-?d{3,5})?$/.test(v), "Use the TIN format 123-456-789-00000")
+    .refine((v) => v === "" || /^\d{3}[A-Z]?$/.test(v), "RDO code is 3 digits, e.g. 050")
     .default(""),
   "company.phone": z.string().trim().max(50).default(""),
   "company.email": z.string().trim().max(200).default(""),

@@ -160,6 +160,8 @@ export async function invoiceList(query: GridQuery, { all }: Opts = {}): Promise
     { key: "customer", label: "Customer" },
     { key: "branch", label: "Branch" },
     { key: "due", label: "Due", kind: "date" },
+    { key: "net", label: "Net of VAT", align: "right" },
+    { key: "vat", label: "VAT", align: "right" },
     { key: "total", label: "Total", align: "right" },
     { key: "margin", label: "Gross margin", align: "right" },
     { key: "balance", label: "Balance", align: "right" },
@@ -176,7 +178,7 @@ export async function invoiceList(query: GridQuery, { all }: Opts = {}): Promise
             ? "Partly paid"
             : "Unpaid";
   const rows = matched.rows.map((i) => {
-    const margin = i.total.isZero() ? 0 : num(i.total.minus(i.costTotal)) / num(i.total);
+    const margin = i.subtotal.isZero() ? 0 : num(i.subtotal.minus(i.costTotal)) / num(i.subtotal);
     return {
       id: i.id,
       href: `/sales/invoices/${i.id}`,
@@ -186,6 +188,8 @@ export async function invoiceList(query: GridQuery, { all }: Opts = {}): Promise
         customer: i.customer.name,
         branch: i.branch.code,
         due: dateCell(i.dueDate, formatDate),
+        net: money(i.subtotal, currency),
+        vat: money(i.vat, currency),
         total: money(i.total, currency),
         margin: { text: `${(margin * 100).toFixed(1)}%`, value: Math.round(margin * 1000) / 10, tone: margin < 0 ? ("danger" as const) : undefined },
         balance: i.state === "void" ? "-" : money(i.total.minus(i.paid), currency),
@@ -228,7 +232,9 @@ export async function paymentList(query: GridQuery, { all }: Opts = {}): Promise
     { key: "branch", label: "Branch" },
     { key: "method", label: "Method" },
     { key: "reference", label: "Reference" },
-    { key: "amount", label: "Amount", align: "right" },
+    { key: "amount", label: "Amount applied", align: "right" },
+    { key: "cwt", label: "Tax withheld", align: "right" },
+    { key: "cash", label: "Cash received", align: "right" },
     { key: "by", label: "By" },
   ];
   const rows = matched.rows.map((p) => ({
@@ -243,6 +249,8 @@ export async function paymentList(query: GridQuery, { all }: Opts = {}): Promise
       method: methodLabel.get(p.method) ?? p.method,
       reference: p.reference || "-",
       amount: money(p.amount, currency),
+      cwt: p.cwt.isZero() ? "-" : money(p.cwt, currency),
+      cash: money(p.amount.minus(p.cwt), currency),
       by: p.createdBy?.name ?? "-",
     },
   }));

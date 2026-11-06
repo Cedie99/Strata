@@ -135,11 +135,13 @@ type InvoiceForJournal = {
   date: Date;
   branchId: string;
   customerId: string;
+  subtotal: Prisma.Decimal;
+  vat: Prisma.Decimal;
   total: Prisma.Decimal;
   lines: { productId: string; qty: Prisma.Decimal; unitCost: Prisma.Decimal; amount: Prisma.Decimal }[];
 };
 
-/** Sale on account (perpetual inventory): Dr receivable / Cr sales, and Dr cost of goods sold / Cr inventory per product. */
+/** Sale on account (perpetual inventory): Dr receivable / Cr sales + output VAT, and Dr cost of goods sold / Cr inventory per product. */
 export function journalForInvoice(tx: Tx, userId: string, inv: InvoiceForJournal) {
   const common = { branchId: inv.branchId };
   return postJournal(tx, {
@@ -151,7 +153,8 @@ export function journalForInvoice(tx: Tx, userId: string, inv: InvoiceForJournal
     userId,
     lines: [
       { ...common, account: "AR", debit: inv.total, customerId: inv.customerId },
-      { ...common, account: "SALES", credit: inv.total },
+      { ...common, account: "SALES", credit: inv.subtotal },
+      { ...common, account: "OUTPUT_VAT", credit: inv.vat, customerId: inv.customerId, memo: "Output VAT" },
       ...inv.lines.flatMap((l) => pair("COGS", "INVENTORY", money(l.qty.times(l.unitCost)), { ...common, productId: l.productId })),
     ],
   });
@@ -167,8 +170,9 @@ export async function journalForInvoiceVoid(tx: Tx, userId: string, inv: Invoice
 export function journalForPayment(
   tx: Tx,
   userId: string,
-  p: { id: string; number: string; date: Date; amount: Prisma.Decimal; invoice: { number: string; branchId: string; customerId: string } },
+  p: { id: string; number: string; date: Date; amount: Prisma.Decimal; cwt: Prisma.Decimal; invoice: { number: string; branchId: string; customerId: string } },
 ) {
+  // Tax the customer withheld is not cash: it is credited against our income tax (Form 2307 received).
   return postJournal(tx, {
     date: p.date,
     sourceType: "Payment",
@@ -177,7 +181,8 @@ export function journalForPayment(
     memo: `Payment for ${p.invoice.number}`,
     userId,
     lines: [
-      { account: "CASH", branchId: p.invoice.branchId, debit: p.amount },
+      { account: "CASH", branchId: p.invoice.branchId, debit: p.amount.minus(p.cwt) },
+      { account: "CWT", branchId: p.invoice.branchId, debit: p.cwt, customerId: p.invoice.customerId, memo: "Creditable withholding tax" },
       { account: "AR", branchId: p.invoice.branchId, credit: p.amount, customerId: p.invoice.customerId },
     ],
   });

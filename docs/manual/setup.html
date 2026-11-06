@@ -17,6 +17,7 @@
     <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK" aria-current="page">Setup &amp; Security</a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
   </div>
@@ -43,8 +44,9 @@
     <div>
       <h3>Company settings</h3>
       <div class="menu">Setup → Global Setup ► Company settings</div>
-      <p>Company name (shown as "Licensed to"), currency code (e.g. PHP), registered address, TIN, phone and email.</p>
+      <p>Company name (shown as "Licensed to"), currency code (e.g. PHP), registered address, TIN, <b>RDO code</b>, phone and email.</p>
       <ul>
+        <li>TIN, address and RDO code head every BIR report and go into the SLS / SLP data files.</li>
         <li>Name, address, TIN, phone and email form the <b>letterhead of every printed document</b>; fill them in before printing.</li>
         <li>The address also appears on the sign-in page.</li>
       </ul>
@@ -118,7 +120,7 @@
     <div>
       <h3>Audit log</h3>
       <div class="menu">Setup → Security ► Audit log</div>
-      <p>Every change: who, when, what, with the values before and after. Each entry is chained to the previous one by a fingerprint. <b>Verify the log has not been tampered with</b> checks the whole chain and reports the first entry that was altered, if any.</p>
+      <p>Every change: who, when, what, with the values before and after. Each entry is chained to the previous one by a fingerprint. <b>Verify the log has not been tampered with</b> checks the whole chain and reports the first entry that was altered, if any. The whole log can be exported with its hashes from BIR → CAS readiness.</p>
     </div>
   </section>
 
@@ -133,6 +135,7 @@
         <tr><th>Purchasing</th><td>View suppliers, purchase orders, bills and payments · Create and edit suppliers · Create, close and cancel purchase orders · Receive goods · Post and void supplier bills · Record payments to suppliers</td></tr>
         <tr><th>Finance</th><td>View the business dashboard and cash book · Record cash in and out</td></tr>
         <tr><th>Accounting</th><td>View the ledger, journals and statements · Change the chart of accounts · Post and reverse manual journals · Close and reopen periods</td></tr>
+        <tr><th>BIR</th><td>View BIR books, summary lists, return worksheets and Form 2307 (given to every role that could view the ledger)</td></tr>
         <tr><th>Setup</th><td>View users · Create and edit users · Manage roles · Build custom modules · Create and edit branches · See all branches · Change document numbering · View audit log · Change company settings · Change branding</td></tr>
         <tr><th>Custom modules</th><td>Per module: view records · create and edit records · approve records</td></tr>
       </tbody>

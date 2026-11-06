@@ -296,6 +296,10 @@ model Customer {
   phone     String   @default("")
   address   String   @default("")
   termsDays Int      @default(30) // invoice due date = invoice date + terms
+  tin       String   @default("") // e.g. 123-456-789-00000; needed on the sales list (SLS) and SAWT
+  vatCode   String   @default("VAT") // default VAT treatment of sales to them: VAT | ZERO | EXEMPT
+  cwtRate   Decimal  @default(0) // percent the customer usually withholds from our invoices (Form 2307), e.g. 1
+  cwtAtc    String   @default("") // ATC of that withholding, e.g. WC158
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -315,8 +319,10 @@ model SalesInvoice {
   date        DateTime
   dueDate     DateTime
   status      String    @default("POSTED") // POSTED | VOID
-  total       Decimal // sum of line amounts
-  costTotal   Decimal // sum of qty × cost at posting; gross profit = total − costTotal
+  subtotal    Decimal // sum of line amounts, net of VAT (the revenue)
+  vat         Decimal   @default(0) // output VAT
+  total       Decimal // subtotal + VAT: what the customer owes
+  costTotal   Decimal // sum of qty × cost at posting; gross profit = subtotal − costTotal
   reference   String    @default("") // customer PO, DR number …
   note        String    @default("")
   createdById String?
@@ -342,7 +348,9 @@ model SalesInvoiceLine {
   qty       Decimal
   unitPrice Decimal
   unitCost  Decimal // the product's cost when the invoice was posted
-  amount    Decimal // qty × unitPrice
+  amount    Decimal // qty × unitPrice, net of VAT
+  vatCode   String // VAT | ZERO | EXEMPT (invoices from before VAT on sales are EXEMPT)
+  vat       Decimal @default(0)
 
   invoice SalesInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   product Product      @relation(fields: [productId], references: [id])
@@ -352,13 +360,16 @@ model SalesInvoiceLine {
 }
 
 // Money received against one invoice. Several partial payments may settle an invoice.
-// Payments count as cash in for the invoice's branch.
+// amount = what the invoice is reduced by; cwt = tax the customer withheld (they give us Form 2307);
+// amount − cwt is the cash received, which counts as cash in for the invoice's branch.
 model Payment {
   id          String   @id @default(cuid())
   number      String   @unique // e.g. PAY-MNL-2026-000001
   invoiceId   String
   date        DateTime
   amount      Decimal
+  cwt         Decimal  @default(0) // creditable withholding tax withheld by the customer
+  atc         String   @default("") // its ATC, e.g. WC158
   method      String // CASH | CHECK | BANK_TRANSFER | CARD | OTHER
   reference   String   @default("") // check or transfer number
   note        String   @default("")

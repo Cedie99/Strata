@@ -53,9 +53,9 @@ export async function cashList(query: GridQuery, { all }: { all?: boolean } = {}
       branch: p.invoice.branch.code,
       direction: "IN",
       category: "Customer payment",
-      description: `${p.invoice.customer.name} · ${p.invoice.number}`,
+      description: `${p.invoice.customer.name} · ${p.invoice.number}${p.cwt.isZero() ? "" : " (net of tax withheld)"}`,
       reference: p.reference,
-      amount: p.amount,
+      amount: p.amount.minus(p.cwt),
       by: p.createdBy?.name ?? "-",
     })),
     ...supplierPayments.map((p) => ({

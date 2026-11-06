@@ -66,7 +66,7 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
   const [invoices, periodLines, open, payments, paidAllTime, cash, cashAllTime, levels, products, branches, supplierPaid, supplierPaidAllTime] = await Promise.all([
     client.salesInvoice.findMany({
       where: { status: "POSTED", branchId: branch, date: { gte: since, lt: tomorrow } },
-      select: { date: true, total: true, costTotal: true, customerId: true, branchId: true, customer: { select: { name: true } } },
+      select: { date: true, subtotal: true, costTotal: true, customerId: true, branchId: true, customer: { select: { name: true } } },
     }),
     client.salesInvoiceLine.findMany({
       where: { invoice: { status: "POSTED", branchId: branch, date: { gte: period.from, lt: period.to } } },
@@ -78,9 +78,9 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
     }),
     client.payment.findMany({
       where: { invoice: { branchId: branch }, date: { gte: since, lt: tomorrow } },
-      select: { date: true, amount: true },
+      select: { date: true, amount: true, cwt: true },
     }),
-    client.payment.aggregate({ where: { invoice: { branchId: branch }, date: { lt: tomorrow } }, _sum: { amount: true } }),
+    client.payment.aggregate({ where: { invoice: { branchId: branch }, date: { lt: tomorrow } }, _sum: { amount: true, cwt: true } }),
     client.cashEntry.findMany({
       where: { branchId: branch, date: { gte: since, lt: tomorrow } },
       select: { date: true, amount: true, direction: true, category: true },
@@ -98,14 +98,14 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
   // ── Revenue and gross profit ──
   const cur = invoices.filter((i) => inRange(i.date, period.from, period.to));
   const prev = invoices.filter((i) => inRange(i.date, period.prevFrom, period.prevTo));
-  const revenue = n(sum(cur, (i) => i.total));
-  const prevRevenue = n(sum(prev, (i) => i.total));
-  const grossProfit = n(sum(cur, (i) => i.total.minus(i.costTotal)));
-  const prevGrossProfit = n(sum(prev, (i) => i.total.minus(i.costTotal)));
+  const revenue = n(sum(cur, (i) => i.subtotal));
+  const prevRevenue = n(sum(prev, (i) => i.subtotal));
+  const grossProfit = n(sum(cur, (i) => i.subtotal.minus(i.costTotal)));
+  const prevGrossProfit = n(sum(prev, (i) => i.subtotal.minus(i.costTotal)));
 
   // ── Cash ──
   const cashIn = (from: Date, to: Date) =>
-    sum(payments.filter((p) => inRange(p.date, from, to)), (p) => p.amount).plus(
+    sum(payments.filter((p) => inRange(p.date, from, to)), (p) => p.amount.minus(p.cwt)).plus(
       sum(cash.filter((c) => c.direction === "IN" && inRange(c.date, from, to)), (c) => c.amount),
     );
   const cashOut = (from: Date, to: Date) =>
@@ -124,8 +124,8 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
     const from = new Date(trendStart.getFullYear(), trendStart.getMonth() + k, 1);
     const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
     const inv = invoices.filter((i) => inRange(i.date, from, to));
-    const rev = n(sum(inv, (i) => i.total));
-    const gp = n(sum(inv, (i) => i.total.minus(i.costTotal)));
+    const rev = n(sum(inv, (i) => i.subtotal));
+    const gp = n(sum(inv, (i) => i.subtotal.minus(i.costTotal)));
     const cin = n(cashIn(from, to));
     const cout = n(cashOut(from, to));
     return {
@@ -162,7 +162,7 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
   // Days sales outstanding: what is owed, in days of the last 90 days' average sales.
   const last90 = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 89);
   const recent = invoices.filter((i) => inRange(i.date, last90, tomorrow));
-  const dailySales = n(sum(recent, (i) => i.total)) / 90;
+  const dailySales = n(sum(recent, (i) => i.subtotal)) / 90;
   const dailyCogs = n(sum(recent, (i) => i.costTotal)) / 90;
 
   // ── Inventory ──
@@ -194,16 +194,16 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
   const customerSales = new Map<string, { id: string; name: string; revenue: Prisma.Decimal; gp: Prisma.Decimal; count: number }>();
   for (const i of cur) {
     const c = customerSales.get(i.customerId) ?? { id: i.customerId, name: i.customer.name, revenue: ZERO, gp: ZERO, count: 0 };
-    c.revenue = c.revenue.plus(i.total);
-    c.gp = c.gp.plus(i.total.minus(i.costTotal));
+    c.revenue = c.revenue.plus(i.subtotal);
+    c.gp = c.gp.plus(i.subtotal.minus(i.costTotal));
     c.count++;
     customerSales.set(i.customerId, c);
   }
   const byBranch = branches
     .map((b) => {
       const rows = cur.filter((i) => i.branchId === b.id);
-      const rev = n(sum(rows, (i) => i.total));
-      const gp = n(sum(rows, (i) => i.total.minus(i.costTotal)));
+      const rev = n(sum(rows, (i) => i.subtotal));
+      const gp = n(sum(rows, (i) => i.subtotal.minus(i.costTotal)));
       return { code: b.code, revenue: rev, grossProfit: gp, margin: ratio(gp, rev) };
     })
     .sort((a, b) => b.revenue - a.revenue);
@@ -231,11 +231,11 @@ export async function getDashboard(branchIds: string[], periodKey: PeriodKey, cl
       daysOnHand: dailyCogs > 0 ? Math.round(n(inventoryValue) / dailyCogs) : null,
     },
     cash: {
-      balance: n(new Prisma.Decimal(paidAllTime._sum.amount ?? ZERO).plus(allTime("IN")).minus(allTime("OUT")).minus(supplierPaidAllTime._sum.net ?? ZERO)),
+      balance: n(new Prisma.Decimal(paidAllTime._sum.amount ?? ZERO).minus(paidAllTime._sum.cwt ?? ZERO).plus(allTime("IN")).minus(allTime("OUT")).minus(supplierPaidAllTime._sum.net ?? ZERO)),
       inflow: n(cashIn(period.from, period.to)),
       outflow: n(cashOut(period.from, period.to)),
       prevNet: n(cashIn(period.prevFrom, period.prevTo).minus(cashOut(period.prevFrom, period.prevTo))),
-      collections: n(sum(payments.filter((p) => inRange(p.date, period.from, period.to)), (p) => p.amount)),
+      collections: n(sum(payments.filter((p) => inRange(p.date, period.from, period.to)), (p) => p.amount.minus(p.cwt))),
       outByCategory: [...outByCategory].map(([category, amount]) => ({ category, amount: n(amount) })).sort((a, b) => b.amount - a.amount),
     },
     months,

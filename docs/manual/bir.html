@@ -1,0 +1,168 @@
+<title>Strata BIR Compliance Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · BIR</p>
+    <h1>Books, lists &amp; returns</h1>
+    <p class="lead">Everything the BIR asks a VAT-registered company to keep and file, built from what you already post. Nothing is entered twice: invoices, bills and payments fill the books, the summary lists and the return worksheets.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq" aria-current="page">BIR</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#flow">Where the figures come from</a><a href="#taxes">VAT and withholding</a><a href="#books">Books of accounts</a><a href="#quarter">Quarterly filing</a><a href="#cas">CAS readiness</a><a href="#howto">How to</a></div>
+
+  <div class="note"><b>Before you start.</b>Fill in the company TIN, registered address and <b>RDO code</b> under Setup → Global Setup → Company settings. Give every customer and supplier their TIN. Reports flag anyone without one.</div>
+
+  <h2 id="flow">Where the figures come from</h2>
+  <p class="sub">Four documents carry the tax. The BIR menu only reads them.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">Sales invoice</div><div class="q">VATable, zero-rated or exempt per line</div><div class="fx"><span class="chip up">output VAT</span></div></li>
+    <li><div class="doc">Payment received</div><div class="q">Did the customer withhold tax?</div><div class="fx"><span class="chip up">CWT · 2307 in</span></div></li>
+    <li><div class="doc">Supplier bill</div><div class="q">VAT type per line, goods or services</div><div class="fx"><span class="chip up">input VAT</span></div></li>
+    <li><div class="doc">Payment made</div><div class="q">Withholding deducted from the supplier</div><div class="fx"><span class="chip up">EWT · 2307 out</span></div></li>
+  </ol>
+
+  <h2 id="taxes">VAT and withholding</h2>
+  <p class="sub">Amounts on invoice and bill lines are always entered net of VAT; Strata adds the 12%.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Tax</th><th>Where you enter it</th><th>Account</th><th>Reported on</th></tr></thead>
+      <tbody>
+        <tr><th>Output VAT</th><td>Sales invoice: VAT column per line (default from the customer)</td><td>2100 Output VAT</td><td>Sales book, SLS, 2550Q</td></tr>
+        <tr><th>Input VAT</th><td>Purchase order and supplier bill lines (none from non-VAT suppliers)</td><td>1300 Input VAT</td><td>Purchases book, SLP, 2550Q</td></tr>
+        <tr><th>Creditable withholding (CWT)</th><td>Record payment: "Tax withheld (2307)" and ATC, suggested from the customer's rate</td><td>1310 Creditable withholding tax</td><td>Cash receipts book, SAWT</td></tr>
+        <tr><th>Expanded withholding (EWT)</th><td>Supplier bill: rate and ATC; deducted when you pay</td><td>2200 Withholding taxes payable</td><td>Cash disbursements book, 1601-EQ, QAP, Form 2307</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="example">Example: an invoice of ₱1,000 net + ₱120 VAT = ₱1,120. The customer withholds 1% of the net (₱10) and pays ₱1,110. Record a payment of <b>₱1,120 applied</b> with <b>₱10 tax withheld</b>: the invoice is settled, cash goes up ₱1,110, and ₱10 waits as a tax credit until you claim it with their Form 2307.</div>
+
+  <h2 id="books">Books of accounts</h2>
+  <p class="sub">Under <b>BIR ► Books of accounts</b>. Pick a date range, then Export to Excel to print or bind.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>General journal and general ledger</h3>
+      <div class="menu">BIR → Books of accounts ► General journal · General ledger</div>
+      <p>The journal lists every entry line in date order with its source document. The ledger shows each account with its balance forward, every line in the period and a running balance (Dr / Cr).</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>Cash receipts and cash disbursements books</h3>
+      <div class="menu">BIR → Books of accounts ► Cash receipts book · Cash disbursements book</div>
+      <p>Every entry that moves cash. Receipts show cash, creditable withholding and receivables in their own columns; disbursements show cash, withholding payable and payables. Anything else is listed under "Other accounts".</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Sales book and purchases book</h3>
+      <div class="menu">BIR → Books of accounts ► Sales book · Purchases book</div>
+      <p>Every invoice or supplier bill in the period with the customer's or supplier's TIN and address, split into exempt, zero-rated and VATable, with the VAT and total. Void documents stay in the list, marked VOID with no amounts, so the numbers have no gaps.</p>
+      <ul>
+        <li>In the purchases book, VATable <b>goods</b> are billed receipts of stock; <b>services</b> are bill lines charged to an expense account.</li>
+      </ul>
+    </div>
+  </section>
+
+  <h2 id="quarter">Quarterly filing</h2>
+  <p class="sub">Pick the quarter. Green ✓ lines at the top confirm the figures agree with the ledger and that TINs are on file.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Menu</th><th>What it gives you</th><th>File with</th><th>Download</th></tr></thead>
+      <tbody>
+        <tr><th>Summary list of sales (SLS)</th><td>Sales per customer: exempt, zero-rated, taxable, output VAT</td><td>2550Q</td><td>Excel, BIR data file (.DAT)</td></tr>
+        <tr><th>Summary list of purchases (SLP)</th><td>Purchases per supplier: exempt, zero-rated, services, goods, input VAT</td><td>2550Q</td><td>Excel, BIR data file (.DAT)</td></tr>
+        <tr><th>2550Q · quarterly VAT</th><td>Sales and purchases by month, output and input VAT, VAT payable</td><td>2550Q</td><td>Excel</td></tr>
+        <tr><th>1601-EQ · QAP</th><td>Tax withheld from suppliers by ATC and month, and the alphalist of payees</td><td>0619-E (months 1–2), 1601-EQ</td><td>Excel</td></tr>
+        <tr><th>SAWT</th><td>Tax your customers withheld from you, per customer and ATC</td><td>2550Q / 1702Q</td><td>Excel</td></tr>
+        <tr><th>Form 2307 for suppliers</th><td>One certificate per supplier you withheld from; click a row to print</td><td>Give to the supplier within 20 days after the quarter</td><td>Print / PDF</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><b>Check before you file.</b>The .DAT files follow the BIR RELIEF layout; run them through the BIR validation module before submitting. QAP and SAWT are given as Excel for the BIR alphalist tool. Input VAT carried over from last quarter, VAT on imports and capital goods are not tracked yet: add them on the form.</div>
+
+  <h2 id="cas">CAS readiness</h2>
+  <p class="sub">BIR → CAS readiness checks, live, what an examiner looks at before registering a computerized accounting system.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Check</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><th>No gaps in document series</th><td>Every invoice, payment, bill, voucher, movement and journal number runs without a missing number.</td></tr>
+        <tr><th>Posted records cannot be changed</th><td>The database itself refuses edits and deletes of posted documents and entries.</td></tr>
+        <tr><th>Audit trail shows tampering</th><td>The audit log's fingerprint chain is intact. <b>Export audit trail</b> gives the whole log with its hashes (needs "View audit log").</td></tr>
+        <tr><th>Books balance</th><td>Total debits equal total credits.</td></tr>
+        <tr><th>Company details on file</th><td>TIN, RDO and address are set.</td></tr>
+        <tr><th>Months are closed</th><td>Reviewed months are closed under Accounting → Periods.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><b>Still internal.</b>Until Strata is registered with the BIR, printed invoices and receipts say "Internal document" and official invoices keep coming from your registered system. Record the official invoice number in the invoice's Reference.</div>
+
+  <h2 id="howto">How to</h2>
+  <p class="sub">The quarterly routine.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Prepare the 2550Q</h3>
+      <ol>
+        <li>Close the quarter's months after review (Accounting → Periods).</li>
+        <li>BIR → 2550Q: check the ✓ lines, then copy the figures into the form.</li>
+        <li>BIR → SLS and SLP: download the .DAT files and validate them.</li>
+        <li>Attach the SAWT if customers withheld tax from you.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Withholding on suppliers</h3>
+      <ol>
+        <li>Remit months 1 and 2 with 0619-E using the 1601-EQ worksheet's month columns.</li>
+        <li>After the quarter, file 1601-EQ with the QAP from the same page.</li>
+        <li>BIR → Form 2307: print one for each supplier and send it.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>When a customer withholds tax</h3>
+      <ol>
+        <li>Set their rate and ATC on the customer (e.g. 1%, WC158).</li>
+        <li>Record the payment for the full amount applied; check the suggested tax withheld.</li>
+        <li>Ask for their Form 2307 and file it; it backs the SAWT.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>A figure does not match the ledger</h3>
+      <ol>
+        <li>A ⚠ line means someone posted a manual journal to a VAT or withholding account.</li>
+        <li>Find it in Accounting → General ledger for that account.</li>
+        <li>Correct it with a reversal; tax accounts should only be moved by documents.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Output VAT and tax withheld by customers</span></a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Input VAT and withholding on suppliers</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>The ledger the BIR books are printed from</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · BIR · updated November 6, 2026.</footer>
+</main>

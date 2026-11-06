@@ -4,6 +4,7 @@ import { audit } from "@/core/audit";
 import { nextNumber } from "@/core/numbering";
 import { assertPeriodOpen, PostingError } from "@/core/posting";
 import { journalForInvoice, journalForInvoiceVoid, journalForPayment, pair, postJournal, today } from "@/modules/accounting/ledger";
+import { vatOf } from "@/core/tax-math";
 import { recordMovement } from "@/modules/inventory/posting";
 import type { InvoiceInput, PaymentInput } from "./schemas";
 
@@ -44,17 +45,22 @@ export async function postInvoice(
     if (!product?.isActive) throw new PostingError(`Line ${i + 1}: that product is inactive or missing.`);
     const qty = new Prisma.Decimal(l.qty);
     const unitPrice = new Prisma.Decimal(l.unitPrice);
+    const amount = qty.times(unitPrice).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
     return {
       productId: product.id,
       qty,
       unitPrice,
       unitCost: product.cost,
-      amount: qty.times(unitPrice).toDecimalPlaces(2),
+      amount,
+      vatCode: l.vatCode,
+      vat: vatOf(amount, l.vatCode),
       // Rounded per line, exactly as the journal credits inventory, so costTotal always equals the posted COGS.
       cost: qty.times(product.cost).toDecimalPlaces(2),
     };
   });
-  const total = lines.reduce((s, l) => s.plus(l.amount), ZERO);
+  const subtotal = lines.reduce((s, l) => s.plus(l.amount), ZERO);
+  const vat = lines.reduce((s, l) => s.plus(l.vat), ZERO);
+  const total = subtotal.plus(vat);
   const costTotal = lines.reduce((s, l) => s.plus(l.cost), ZERO);
 
   const number = await nextNumber(tx, "SalesInvoice", { branchCode: warehouse.branch.code, date: input.date });
@@ -66,12 +72,14 @@ export async function postInvoice(
       warehouseId: warehouse.id,
       date: input.date,
       dueDate: input.dueDate || addDays(input.date, customer.termsDays),
+      subtotal,
+      vat,
       total,
       costTotal,
       reference: input.reference,
       note: input.note,
       createdById: userId,
-      lines: { create: lines.map((l) => ({ productId: l.productId, qty: l.qty, unitPrice: l.unitPrice, unitCost: l.unitCost, amount: l.amount })) },
+      lines: { create: lines.map((l) => ({ productId: l.productId, qty: l.qty, unitPrice: l.unitPrice, unitCost: l.unitCost, amount: l.amount, vatCode: l.vatCode, vat: l.vat })) },
     },
     include: { lines: true },
   });
@@ -138,7 +146,11 @@ export async function voidInvoice(
   return after;
 }
 
-/** Records money received against an invoice; never more than is still owed. */
+/**
+ * Records money received against an invoice; never more than is still owed. The amount is what the invoice
+ * is reduced by; any tax the customer withheld (cwt, backed by their Form 2307) is part of it, so the cash
+ * received is amount − cwt.
+ */
 export async function postPayment(
   tx: Prisma.TransactionClient,
   userId: string,
@@ -152,13 +164,17 @@ export async function postPayment(
   await assertPeriodOpen(tx, input.date);
 
   const amount = new Prisma.Decimal(input.amount);
+  const cwt = new Prisma.Decimal(input.cwt).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
+  if (cwt.greaterThan(amount)) throw new PostingError("The tax withheld cannot be more than the amount applied.");
+  const customer = await tx.customer.findUniqueOrThrow({ where: { id: invoice.customerId } });
+  const atc = cwt.isZero() ? "" : input.atc || customer.cwtAtc;
   const outstanding = await outstandingOf(tx, invoice.id, invoice.total);
   if (amount.greaterThan(outstanding))
     throw new PostingError(`Only ${outstanding.toFixed(2)} is still owed on ${invoice.number}.`);
 
   const number = await nextNumber(tx, "Payment", { branchCode: invoice.branch.code, date: input.date });
   const payment = await tx.payment.create({
-    data: { number, invoiceId: invoice.id, date: input.date, amount, method: input.method, reference: input.reference, note: input.note, createdById: userId },
+    data: { number, invoiceId: invoice.id, date: input.date, amount, cwt, atc, method: input.method, reference: input.reference, note: input.note, createdById: userId },
   });
   await audit({ userId, action: "create", entity: "Payment", entityId: payment.id, after: payment }, tx);
   await journalForPayment(tx, userId, { ...payment, invoice });

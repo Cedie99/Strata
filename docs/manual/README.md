@@ -18,6 +18,7 @@ table below, so keep each row in the same `| Name | source | link | code |` shap
 | Sales | `sales.html` | https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S | `src/modules/sales/`, `src/app/(app)/sales/` |
 | Purchasing | `purchasing.html` | https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu | `src/modules/purchasing/`, `src/app/(app)/purchasing/` |
 | Finance & Accounting | `finance.html` | https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd | `src/modules/finance/`, `src/modules/accounting/`, `src/app/(app)/finance/`, `src/app/(app)/accounting/`, chart of accounts in migrations |
+| BIR | `bir.html` | https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq | `src/modules/tax/`, `src/app/(app)/tax/`, `src/app/print/form-2307/`, `src/core/tax.ts`, `src/core/tax-math.ts`, VAT / withholding fields in Sales and Purchasing |
 | Setup & Security | `setup.html` | https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK | `src/modules/admin/`, `src/app/(app)/admin/`, `src/core/auth/`, `src/core/branding.ts`, `src/core/numbering.ts`, every module's permission list |
 | Custom modules | `custom.html` | https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW | `src/modules/custom/`, `src/app/(app)/m/`, `src/app/(app)/admin/modules/` |
 
