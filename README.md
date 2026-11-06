@@ -1,20 +1,55 @@
 # Strata
 
-Strata is a modular, web-based ERP. A small core (login, users, roles, permissions, audit log, settings)
-plus modules that plug in. The first module is **Inventory**.
+Strata is a web-based ERP for small and mid-size trading companies in the Philippines. It runs buying,
+stock, selling, cash and accounting in one system, across several branches, with books that hold up to an
+audit and are ready for BIR rules.
+
+Strata is built as a small core plus modules that plug into it. Every module posts its own entries to a
+shared double-entry general ledger, so stock, receivables, payables and the financial statements always agree
+with the documents behind them.
+
+### What it does today
+
+| Module | What it covers |
+|---|---|
+| **Inventory** | Products, warehouses per branch, stock movements (receipt, issue, adjustment, transfer), stock on hand, moving-average cost |
+| **Sales** | Customers, sales invoices that issue stock and fix gross margin, payments received, receivables aging |
+| **Purchasing** | Suppliers, purchase orders, receiving reports, supplier bills with input VAT, payments with expanded withholding tax (EWT), payables aging |
+| **Finance** | Business dashboard (revenue, margins, receivables, cash flow, inventory) and cash book |
+| **Accounting** | Automatic journal entries, income statement, balance sheet, trial balance, general ledger, manual journals, month-end close |
+| **Setup** | Users, roles and permissions, branches, document numbering, company settings, branding, tamper-evident audit log |
+| **Custom modules** | New record types, forms, menus, rules and approvals built in the browser without code |
+
+### What makes it different
+
+- **Books you can trust.** Posted documents are never edited or deleted; mistakes are voided or reversed. The
+  database itself enforces balanced entries, closed periods and append-only records, and the audit log is
+  hash-chained so tampering shows.
+- **Built for the Philippines.** VAT-registered by default (12%, zero-rated, exempt), EWT on supplier payments,
+  a Philippine chart of accounts, and a design kept ready for BIR CAS registration (gap-free numbering, full trail).
+- **Multi-branch from the start.** Users see only their branches; every list, report and the dashboard can be
+  narrowed to one branch.
+- **Yours to shape.** Rebrand it (name, logo, fonts, colours) and add your own modules without a developer.
+
+### Where to read more
+
+- **User manual**: `npm run manual` opens it in Microsoft Edge; sources and links in [`docs/manual/`](docs/manual/README.md).
+- **Roadmap**: what is planned next, as a checklist, in [`ROADMAP.md`](ROADMAP.md).
+- The rest of this file is for developers: how to run it, how the code is organised, and the rules it follows.
 
 ## Stack
 
 - Next.js 16 (App Router, Server Components, Server Actions) + React 19 + TypeScript
 - Tailwind CSS v4
-- Prisma 5 with SQLite for development (switch to PostgreSQL for real use)
+- Prisma 5 with PostgreSQL (hosted on Supabase)
 - Zod for validation, bcryptjs for passwords, database-backed sessions in an httpOnly cookie
 
 ## Run it
 
 ```bash
+cp .env.example .env # then set DATABASE_URL and DIRECT_URL to your PostgreSQL / Supabase database
 npm install          # also runs `prisma generate`
-npm run db:migrate   # creates prisma/dev.db and seeds it
+npm run db:migrate   # creates the tables and seeds them
 npm run dev          # http://localhost:3000
 ```
 
