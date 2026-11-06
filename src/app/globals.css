@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/*
+ * Default (Strata) brand. Admins override colours and fonts under Setup → Branding (src/core/branding.ts).
+ * Strata brand: Forest title bar, Obsidian menu bar, white work area, dense grids, square corners.
+ * Brand palette: Forest #0F3B2C, Obsidian #0A0C0B, White, Signal #F2C230.
+ * Signal (--accent) is for small highlights only (active menu, active tab, the icon apex), never large areas.
+ */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --border: #d6dbd8;
+  --text: #0a0c0b;
+  --muted: #5b6560;
+  --primary: #0f3b2c;
+  --primary-text: #ffffff;
+  --danger: #b42318;
+  --ok: #17643a;
+  --accent: #f2c230;
+  --header: #0f3b2c;
+  --header-text: #ffffff;
+  --menubar: #0a0c0b;
+  --menubar-text: #ffffff;
+  --menubar-active: #1a4a39;
+  --tab: #0f3b2c;
+  --tab-text: #ffffff;
+  --row-alt: #f4f6f5;
+  --row-hover: #e4ece8;
+  --row-selected: #1a5a43;
+  --grid-head: #ffffff;
+  /* Chart series (validated for colour-blind separation and contrast on this surface), gridlines, baseline. */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --chart-grid: #eceeed;
+  --chart-axis: #b9c0bc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0c0b;
+    --surface: #111513;
+    --border: #26302b;
+    --text: #e9ede9;
+    --muted: #98a39d;
+    --primary: #4fae84;
+    --primary-text: #0a0c0b;
+    --danger: #ff6b63;
+    --ok: #4cc382;
+    --header: #0f3b2c;
+    --menubar: #0a0c0b;
+    --menubar-active: #1a4a39;
+    --tab: #1a4a39;
+    --row-alt: #151a17;
+    --row-hover: #1c2a23;
+    --row-selected: #1a5a43;
+    --grid-head: #111513;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --chart-grid: #1e2622;
+    --chart-axis: #3a4640;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-text: var(--primary-text);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --color-accent: var(--accent);
+  --color-header: var(--header);
+  --color-header-text: var(--header-text);
+  --color-menubar: var(--menubar);
+  --color-menubar-text: var(--menubar-text);
+  --color-menubar-active: var(--menubar-active);
+  --color-tab: var(--tab);
+  --color-tab-text: var(--tab-text);
+  --color-row-alt: var(--row-alt);
+  --color-row-hover: var(--row-hover);
+  --color-row-selected: var(--row-selected);
+  --color-grid-head: var(--grid-head);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+  /* Typefaces are chosen under Setup → Branding; the brand stylesheet (src/core/branding.ts) sets --brand-font-*. */
+  --font-brand: var(--brand-font-display, "Segoe UI", sans-serif);
+  --font-sans: var(--brand-font-text, "Segoe UI", system-ui, sans-serif);
+  --font-mono: var(--brand-font-mono, Consolas, monospace);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--brand-font-text, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif);
+  font-size: 13px;
+  line-height: 1.45;
+  /* Lining, equal-width digits everywhere so figures in lists and forms line up. */
+  font-variant-numeric: lining-nums tabular-nums;
+  text-rendering: optimizeLegibility;
+}
+
+input,
+select,
+textarea {
+  color: var(--text);
+  background: var(--surface);
+}
+
+/* Links inside pages: the Forest primary is close to the text colour, so links also carry weight
+   and a light underline that darkens on hover. (Buttons styled as links are excluded.) */
+main a.text-primary {
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+main a.text-primary:hover {
+  text-decoration-color: currentColor;
+}

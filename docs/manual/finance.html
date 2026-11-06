@@ -1,0 +1,185 @@
+<title>Strata Finance &amp; Accounting Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Finance &amp; Accounting</p>
+    <h1>Cash, books &amp; reports</h1>
+    <p class="lead">You rarely write accounting entries by hand in Strata. Sales, Purchasing and Inventory post them as they happen. Finance shows how the business is doing; Accounting keeps the general ledger, the statements and the month-end close.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd" aria-current="page">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#flow">Where the numbers come from</a><a href="#finance">Finance</a><a href="#accounting">Accounting</a><a href="#postings">What posts where</a><a href="#close">Month-end</a></div>
+
+  <h2 id="flow">Where the numbers come from</h2>
+  <p class="sub">Documents post journal entries; the ledger adds them up; reports and the dashboard read the result.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">Documents</div><div class="q">Invoices, bills, payments, movements, cash book</div><div class="fx"><span class="chip">posted automatically</span></div></li>
+    <li><div class="doc">Journal entries</div><div class="q">One balanced entry per document</div><div class="fx"><span class="chip">debits = credits</span></div></li>
+    <li><div class="doc">General ledger</div><div class="q">Every account with a running balance</div><div class="fx"><span class="chip none">per branch</span></div></li>
+    <li><div class="doc">Statements</div><div class="q">Income statement, balance sheet, trial balance</div><div class="fx"><span class="chip none">export to Excel</span></div></li>
+  </ol>
+
+  <h2 id="finance">Finance</h2>
+  <p class="sub">Under the <b>Finance</b> menu. For owners and managers.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Business dashboard</h3>
+      <div class="menu">Finance → Business dashboard</div>
+      <p>The state of the business on one page, compared with the previous period. Pick the period: this month, last month, this quarter, this year or the last 12 months. It follows the branch picker.</p>
+      <ul>
+        <li><b>Sales</b>: revenue, gross profit and margin; top products and customers; sales by branch.</li>
+        <li><b>Receivables</b>: what customers owe, by age, and the biggest debtors.</li>
+        <li><b>Cash</b>: cash balance, money in and out, and 12 months of cash flow.</li>
+        <li><b>Inventory</b>: stock value at cost and days of stock.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>Cash book</h3>
+      <div class="menu">Finance → Cash book</div>
+      <p>All money in and out of a branch. Customer payments and payments to suppliers appear here automatically; use <b>New</b> for everything else.</p>
+      <div class="scroll" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Direction</th><th>Categories you can enter</th><th>Added automatically</th></tr></thead>
+          <tbody>
+            <tr><th>Cash in</th><td>Opening balance, Owner capital, Loan received, Other income</td><td>Customer payments (from Sales)</td></tr>
+            <tr><th>Cash out</th><td>Payroll, Rent &amp; utilities, Taxes &amp; fees, Loan repayment, Owner drawings, Other expense, Supplier payment</td><td>Payments to suppliers (from Purchasing), net of withholding</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>For suppliers with bills, pay through <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing → Payments made</a>, not the "Supplier payment" category, so the bill is cleared and withholding is recorded.</li>
+        <li>Entries are never edited; correct a mistake with an opposite entry.</li>
+      </ul>
+    </div>
+  </section>
+
+  <h2 id="accounting">Accounting</h2>
+  <p class="sub">Under the <b>Accounting</b> menu. For accountants and bookkeepers.</p>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Reports</h3>
+      <div class="menu">Accounting → Reports ► Income statement · Balance sheet · Trial balance · General ledger</div>
+      <p>Each report works per branch (title-bar picker) or for all your branches, and exports to Excel. In the general ledger every line links to the document that posted it, so you can trace any figure back to its invoice, bill or movement.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">4</div>
+    <div>
+      <h3>Journal entries</h3>
+      <div class="menu">Accounting → Journal entries</div>
+      <p>Every entry, automatic and manual, numbered like <span class="mono">JE-MNL-2026-000123</span>. Use <b>New</b> for accruals, corrections and opening balances.</p>
+      <ul>
+        <li>An entry must balance (debits = credits) and cannot be dated in a closed month.</li>
+        <li>Manual entries cannot touch <b>receivables, inventory, payables or goods received not invoiced</b>. Those balances come from their documents; change them through Sales, Inventory or Purchasing.</li>
+        <li>Posted entries are never edited. Open one and <b>Reverse</b> it, then post the correct entry.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">5</div>
+    <div>
+      <h3>Chart of accounts</h3>
+      <div class="menu">Accounting → Chart of accounts</div>
+      <p>Starts with a Philippine trading chart, including Input VAT, Output VAT and withholding accounts. Codes set the grouping:</p>
+      <div class="scroll" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Codes</th><th>Group</th><th>Examples</th></tr></thead>
+          <tbody>
+            <tr><th>1…</th><td>Assets</td><td>1000 Cash, 1100 Receivables, 1200 Inventory, 1300 Input VAT</td></tr>
+            <tr><th>2…</th><td>Liabilities</td><td>2000 Payables, 2050 Goods received not invoiced, 2100 Output VAT, 2200 Withholding taxes payable</td></tr>
+            <tr><th>3…</th><td>Equity</td><td>3000 Owner's capital, 3900 Opening balance equity</td></tr>
+            <tr><th>40–48 / 49</th><td>Revenue / other income</td><td>4000 Sales, 4900 Other income</td></tr>
+            <tr><th>5…</th><td>Cost of sales</td><td>5000 Cost of goods sold, 5100 Inventory adjustments</td></tr>
+            <tr><th>6–9</th><td>Expenses</td><td>6100 Salaries, 6200 Rent and utilities</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:10px">System accounts (the ones Strata posts to) can be renamed but keep their type. You can add your own accounts for expense lines and manual journals.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">6</div>
+    <div>
+      <h3>Periods</h3>
+      <div class="menu">Accounting → Periods</div>
+      <p>Close a month once it has ended and is checked. Months close in order. A closed month accepts no postings from any module. Reopening is possible for users with the permission and is recorded in the audit log.</p>
+    </div>
+  </section>
+
+  <h2 id="postings">What posts where</h2>
+  <p class="sub">The entry each document writes. Dr = debit, Cr = credit.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Document</th><th>Entry</th></tr></thead>
+      <tbody>
+        <tr><th>Sales invoice</th><td>Dr Receivable / Cr Sales; Dr Cost of goods sold / Cr Inventory</td></tr>
+        <tr><th>Invoice void</th><td>Reverses the invoice's entry on the invoice date</td></tr>
+        <tr><th>Payment received</th><td>Dr Cash / Cr Receivable</td></tr>
+        <tr><th>Receiving report</th><td>Dr Inventory / Cr Goods received not invoiced (plus revaluation to the new average cost)</td></tr>
+        <tr><th>Supplier bill</th><td>Dr Goods received not invoiced or expense + Dr Input VAT / Cr Payables</td></tr>
+        <tr><th>Payment made</th><td>Dr Payables / Cr Cash (net) + Cr Withholding taxes payable</td></tr>
+        <tr><th>Cash book entry</th><td>Cash against the category's account</td></tr>
+        <tr><th>Stock movement</th><td>Receipt: Dr Inventory / Cr Payables (or Opening equity). Issue, adjustment: Inventory against Inventory adjustments. Transfer between branches: through inter-branch clearing</td></tr>
+        <tr><th>Product cost change</th><td>Stock on hand revalued: Inventory against Inventory adjustments</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="close">Month-end, step by step</h2>
+  <p class="sub">A simple routine that keeps the books ready for the BIR.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Before closing</h3>
+      <ol>
+        <li>Make sure all invoices, bills, payments and cash entries for the month are posted.</li>
+        <li>Check Purchasing → Receiving reports for goods "Not billed".</li>
+        <li>Post accruals and corrections as manual journals.</li>
+        <li>Run the trial balance; debits must equal credits.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Close and report</h3>
+      <ol>
+        <li>Review the income statement and balance sheet per branch.</li>
+        <li>Export them to Excel for your records.</li>
+        <li>Accounting → Periods → close the month.</li>
+        <li>Anything found later is corrected in the current open month.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Revenue, receivables, cash in</span></a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Payables, input VAT, withholding</span></a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL"><b>Inventory</b><span>Stock value and adjustments</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Finance &amp; Accounting · updated November 6, 2026.</footer>
+</main>

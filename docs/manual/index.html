@@ -1,0 +1,220 @@
+<title>Strata User Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+<style>
+  .map { min-width: 760px; display: block; width: 100%; height: auto; }
+  .map .box { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+  .map .box.core { fill: var(--surface); }
+  .map .bar { fill: var(--forest); }
+  .map .t { fill: var(--text); font: 700 15px var(--f-body); }
+  .map .s { fill: var(--muted); font: 500 12px var(--f-body); }
+  .map .lbl { fill: var(--muted); font: 600 11.5px var(--f-body); }
+  .map .ln { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+  .map .hot { stroke: var(--signal); stroke-width: 2.4; fill: none; }
+  .map .tip { fill: var(--muted); }
+  .map .tiphot { fill: var(--signal); }
+  .rules { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .rules li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .rules li > span:first-child { font-family: var(--f-display); color: var(--num); font-size: 18px; }
+  .rules p { margin: 2px 0 0; color: var(--muted); }
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual</p>
+    <h1>Start here</h1>
+    <p class="lead">How Strata is laid out, how its modules hand work to each other, and the few rules that apply everywhere. Each module has its own page in the bar below.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R" aria-current="page">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#map">System map</a><a href="#screen">The screen</a><a href="#lists">Lists and records</a><a href="#rules">Rules everywhere</a><a href="#pages">Manual pages</a></div>
+
+  <h2 id="map">How the modules connect</h2>
+  <p class="sub">Goods flow left to right: bought in Purchasing, held in Inventory, sold in Sales. Every step posts to the general ledger by itself. Finance reads the results; Setup decides who can do what.</p>
+  <div class="scroll">
+    <svg class="map" viewBox="0 0 900 470" role="img" aria-labelledby="map-title">
+      <title id="map-title">Strata module map: Setup governs all modules; goods flow from Purchasing to Inventory to Sales; all three post to Accounting; Finance reads Sales, Purchasing and the cash book.</title>
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="tip" d="M0 0 10 5 0 10z"/></marker>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="tiphot" d="M0 0 10 5 0 10z"/></marker>
+      </defs>
+
+      <!-- Setup -->
+      <rect class="box core" x="20" y="16" width="860" height="62"/>
+      <rect class="bar" x="20" y="16" width="6" height="62"/>
+      <text class="t" x="40" y="42">Setup &amp; Security</text>
+      <text class="s" x="40" y="62">Users, roles, branches, document numbering, company settings, branding, audit log, custom modules</text>
+      <path class="ln" d="M150 78v52M450 78v52M750 78v52" stroke-dasharray="3 4" marker-end="url(#a)"/>
+      <text class="lbl" x="460" y="108">who may see and do what, in which branch</text>
+
+      <!-- Operations row -->
+      <rect class="box" x="40" y="136" width="220" height="104"/>
+      <text class="t" x="58" y="164">Purchasing</text>
+      <text class="s" x="58" y="186">Suppliers, purchase orders,</text>
+      <text class="s" x="58" y="203">receiving, supplier bills,</text>
+      <text class="s" x="58" y="220">payments made, payables</text>
+
+      <rect class="box" x="340" y="136" width="220" height="104"/>
+      <text class="t" x="358" y="164">Inventory</text>
+      <text class="s" x="358" y="186">Products, warehouses,</text>
+      <text class="s" x="358" y="203">stock movements,</text>
+      <text class="s" x="358" y="220">stock on hand</text>
+
+      <rect class="box" x="640" y="136" width="220" height="104"/>
+      <text class="t" x="658" y="164">Sales</text>
+      <text class="s" x="658" y="186">Customers, sales invoices,</text>
+      <text class="s" x="658" y="203">payments received,</text>
+      <text class="s" x="658" y="220">receivables</text>
+
+      <path class="hot" d="M262 176h74" marker-end="url(#ah)"/>
+      <text class="lbl" x="268" y="166">goods in</text>
+      <path class="hot" d="M562 176h74" marker-end="url(#ah)"/>
+      <text class="lbl" x="566" y="166">goods out</text>
+      <text class="lbl" x="268" y="206">at PO cost</text>
+      <text class="lbl" x="566" y="206">at avg. cost</text>
+
+      <!-- Ledger -->
+      <path class="ln" d="M150 240v76M450 240v76M750 240v76" marker-end="url(#a)"/>
+      <text class="lbl" x="160" y="290">bills, payments</text>
+      <text class="lbl" x="460" y="290">stock value</text>
+      <text class="lbl" x="760" y="290">invoices, payments</text>
+      <rect class="box core" x="20" y="322" width="600" height="72"/>
+      <rect class="bar" x="20" y="322" width="6" height="72"/>
+      <text class="t" x="40" y="350">Accounting · general ledger</text>
+      <text class="s" x="40" y="371">Every posting writes a balanced journal entry. Income statement, balance sheet,</text>
+      <text class="s" x="40" y="387">trial balance, general ledger, manual journals, period close.</text>
+
+      <rect class="box" x="660" y="322" width="220" height="72"/>
+      <text class="t" x="678" y="350">Finance</text>
+      <text class="s" x="678" y="371">Business dashboard,</text>
+      <text class="s" x="678" y="387">cash book</text>
+      <path class="ln" d="M622 358h34" marker-end="url(#a)"/>
+
+      <text class="s" x="20" y="430">Solid yellow arrows: goods. Grey arrows: information that is posted automatically. Dashed: permissions.</text>
+      <text class="s" x="20" y="450">Custom modules built in Setup appear as their own menus or inside a built-in one.</text>
+    </svg>
+  </div>
+
+  <h2>What feeds what</h2>
+  <p class="sub">When you save something in one module, these are the other places that change. Nobody re-enters it.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>When you…</th><th>Inventory</th><th>Accounting</th><th>Finance</th></tr></thead>
+      <tbody>
+        <tr><th>Receive goods on a purchase order</th><td><span class="chip up">stock ↑</span> <span class="chip up">average cost</span></td><td>Inventory, goods received not invoiced</td><td>—</td></tr>
+        <tr><th>Post a supplier bill</th><td>—</td><td>Input VAT, accounts payable</td><td>—</td></tr>
+        <tr><th>Pay a supplier</th><td>—</td><td>Payables ↓, cash ↓, withholding tax payable</td><td><span class="chip down">cash out</span></td></tr>
+        <tr><th>Post a sales invoice</th><td><span class="chip down">stock ↓</span></td><td>Receivable, sales, cost of goods sold, inventory</td><td>Revenue, gross profit</td></tr>
+        <tr><th>Record a customer payment</th><td>—</td><td>Cash ↑, receivable ↓</td><td><span class="chip up">cash in</span></td></tr>
+        <tr><th>Post a stock movement</th><td><span class="chip">stock ±</span></td><td>Inventory against adjustments (or opening equity)</td><td>Inventory value</td></tr>
+        <tr><th>Enter a cash book line</th><td>—</td><td>Cash against the category's account</td><td><span class="chip">cash in / out</span></td></tr>
+        <tr><th>Change a product's cost</th><td>—</td><td>Stock on hand revalued</td><td>Inventory value</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="screen">The screen</h2>
+  <p class="sub">The same layout on every page.</p>
+  <section class="screen">
+    <div class="n">A</div>
+    <div>
+      <h3>Title bar</h3>
+      <p>Logo and system name (set by your administrator under Setup → Branding). On the right: the <b>branch picker</b>, your name (sign out here) and your roles.</p>
+      <ul>
+        <li>The <b>branch picker</b> narrows every list, report and the dashboard to one branch. Choose "All branches" to see every branch you are assigned to.</li>
+        <li>New documents belong to the branch of the warehouse you choose on them.</li>
+      </ul>
+    </div>
+  </section>
+  <section class="screen">
+    <div class="n">B</div>
+    <div>
+      <h3>Menu bar</h3>
+      <p>One menu per module: Inventory, Sales, Purchasing, Finance, Accounting, Setup, plus any custom modules. You only see the menus and items your role allows. Some items sit in a ► submenu.</p>
+    </div>
+  </section>
+  <section class="screen">
+    <div class="n">C</div>
+    <div>
+      <h3>Home page</h3>
+      <p>A shortcut to the business dashboard, a stock summary (active products, warehouses, products low on stock) and quick links to custom modules — again only what your role can open.</p>
+    </div>
+  </section>
+
+  <h2 id="lists">Lists and records</h2>
+  <p class="sub">Every module uses the same list and record screens, so once you know one you know them all.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Find something in a list</h3>
+      <ol>
+        <li>Type in the search box (numbers, names, references).</li>
+        <li>Click a letter to jump to names starting with it.</li>
+        <li>Open <b>Filters</b> for dates, status, branch and more.</li>
+        <li>Use the funnel on a column heading for "contains", "greater than", date ranges.</li>
+        <li>Click a row to open the record.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Export or import with Excel</h3>
+      <ol>
+        <li><b>Export</b> downloads exactly the rows you are seeing (search and filters applied).</li>
+        <li><b>Import</b> (products, warehouses, stock movements, custom records) offers a template to download.</li>
+        <li>Fill in the template and upload it.</li>
+        <li>An import is all or nothing: if one row is wrong, nothing is saved and every problem is listed.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Read a record</h3>
+      <ol>
+        <li><b>List</b> tab goes back to the list; <b>General</b> is the record itself.</li>
+        <li><b>Attachments</b> (products, warehouses, custom records) holds files up to 10 MB each.</li>
+        <li>Document pages show "Accounting entries" at the bottom if you may see the ledger.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>When a button is missing</h3>
+      <ol>
+        <li>Your role does not include that permission.</li>
+        <li>Or the document's state does not allow it (e.g. a paid invoice cannot be voided).</li>
+        <li>Ask your administrator to adjust your role under Setup → Roles.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2 id="rules">Rules that apply everywhere</h2>
+  <p class="sub">These keep the books trustworthy for auditors and the BIR. The database itself enforces them.</p>
+  <ol class="rules">
+    <li><span>1</span><div><b>Posted documents are never edited or deleted.</b><p>Void an unpaid invoice or bill, reverse a journal, or post an adjustment. The original stays visible.</p></div></li>
+    <li><span>2</span><div><b>Every change is recorded.</b><p>The audit log keeps who did what and when, with the before and after. Its fingerprint chain shows if anyone tampers with it.</p></div></li>
+    <li><span>3</span><div><b>Closed months stay closed.</b><p>Once accounting closes a month, nothing can be dated in it. Post corrections in an open month.</p></div></li>
+    <li><span>4</span><div><b>Numbers never skip.</b><p>Invoice, bill and movement numbers are taken when you save, per branch and year, with no gaps.</p></div></li>
+    <li><span>5</span><div><b>Stock never goes below zero.</b><p>An issue, sale or transfer that would take more than is on hand is refused.</p></div></li>
+    <li><span>6</span><div><b>Sign-ins last 7 days.</b><p>After that you sign in again. Never share your password; every action is recorded under your name.</p></div></li>
+  </ol>
+
+  <h2 id="pages">Manual pages</h2>
+  <p class="sub">Grouped by how closely the modules work together.</p>
+  <div class="related">
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL"><b>Inventory</b><span>Products, warehouses, stock movements, stock on hand</span></a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Customers, invoices, payments received, receivables</span></a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Suppliers, POs, receiving, bills, payments, payables</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Dashboard, cash book, ledger, statements, period close</span></a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK"><b>Setup &amp; Security</b><span>Users, roles, branches, numbering, settings, branding, audit</span></a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW"><b>Custom modules</b><span>Build your own records and menus without code</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · updated November 6, 2026.</footer>
+</main>

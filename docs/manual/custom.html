@@ -1,0 +1,131 @@
+<title>Strata Custom Modules Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Custom modules</p>
+    <h1>Build your own records</h1>
+    <p class="lead">When the company needs to track something Strata does not have (vehicles, trips, contracts, an item master), an administrator can build it under Setup without writing code. Strata creates the list, the form, the menu and the permissions.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW" aria-current="page">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#parts">The parts</a><a href="#fields">Field types</a><a href="#options">Options</a><a href="#howto">How to</a><a href="#limits">Limits</a></div>
+
+  <h2 id="parts">The parts of a module</h2>
+  <p class="sub">A module holds one or more record types; each record type has its own fields and records.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">Module</div><div class="q">e.g. Fleet</div><div class="fx"><span class="chip">menu</span><span class="chip">3 permissions</span></div></li>
+    <li><div class="doc">Record type</div><div class="q">e.g. Vehicles, Trips</div><div class="fx"><span class="chip">list + form</span></div></li>
+    <li><div class="doc">Fields</div><div class="q">e.g. Plate no., Driver, Odometer</div><div class="fx"><span class="chip none">your design</span></div></li>
+    <li><div class="doc">Records</div><div class="q">The actual vehicles and trips</div><div class="fx"><span class="chip">import / export</span><span class="chip">attachments</span></div></li>
+  </ol>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Where it lives</h3>
+      <div class="menu">Setup → Customization ► Modules</div>
+      <p>Needs the permission "Build and change custom modules". Each module's records are at <span class="mono">/m/&lt;module&gt;/&lt;record type&gt;</span>.</p>
+      <ul>
+        <li><b>Show in menu</b>: give the module its own menu, or place it inside a built-in one (e.g. under Inventory), optionally in a named ► submenu shared with other modules (e.g. Setup ► Inventory/WMS ► Item Master).</li>
+        <li>Each module adds three permissions to the Roles screen: <b>view</b>, <b>manage</b> (create and edit) and <b>approve</b> records.</li>
+        <li>Active custom modules show as quick links on the home page for people who can open them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <h2 id="fields">Field types</h2>
+  <p class="sub">Pick the type that matches the data; Strata validates it on every save and import.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Group</th><th>Types</th></tr></thead>
+      <tbody>
+        <tr><th>Text</th><td>Text, long text, email, phone, URL</td></tr>
+        <tr><th>Numbers</th><td>Number, decimal, money, percent</td></tr>
+        <tr><th>Dates</th><td>Date, date &amp; time</td></tr>
+        <tr><th>Choices</th><td>Yes/no, choice list, multiple choice</td></tr>
+        <tr><th>Links</th><td>Lookup to built-in lists (products, warehouses, customers, item types, item classes, branches, users) or to any custom record type</td></tr>
+        <tr><th>Automatic</th><td>Auto number (uses Document numbering), calculated (formula)</td></tr>
+        <tr><th>Other</th><td>File, section heading (to group the form)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="options">Options</h2>
+  <p class="sub">Per field and per record type.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Per field</h3>
+      <ol>
+        <li>Required, default value (<span class="mono">today</span> for dates), unique.</li>
+        <li>Show in list, searchable, help text.</li>
+        <li>Lock after creation.</li>
+        <li>Show only when another field has certain values.</li>
+        <li>For lookups: filter by another field (e.g. Item Class by Item Type).</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Per record type</h3>
+      <ol>
+        <li>One-page or tabbed form (each section heading becomes a tab).</li>
+        <li><b>Rules</b> every record must pass, e.g. <span class="mono">price &gt;= cost</span>.</li>
+        <li><b>Approval</b>: new and changed records stay Pending until a different user with "approve" decides.</li>
+        <li><b>Related records</b>: a lookup from Trips to Vehicles lists a vehicle's trips on its page, or shows them as editable lines inside the vehicle's form.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="note"><b>Formulas</b>Calculated fields and rules use a small formula language: <span class="mono">+ − × ÷ %</span>, comparisons, <span class="mono">and / or / not</span>, and the functions <span class="mono">round floor ceil abs min max if empty len days</span>. Example: <span class="mono">round(qty * price, 2)</span>.</div>
+
+  <h2 id="howto">How to</h2>
+  <p class="sub">A worked example.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Track company vehicles</h3>
+      <ol>
+        <li>Setup → Modules → New: name "Fleet", own menu.</li>
+        <li>Add record type "Vehicles": Plate no. (text, unique), Model, Assigned to (lookup to users), Registration expiry (date).</li>
+        <li>Add record type "Trips": Vehicle (lookup to Vehicles), Date, Odometer start/end, Distance (calculated: end − start).</li>
+        <li>Add the rule <span class="mono">odometer_end &gt;= odometer_start</span>.</li>
+        <li>Give the "view"/"manage" permissions to the right roles.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Load existing data</h3>
+      <ol>
+        <li>Open the record type's list → Import → download the template.</li>
+        <li>Fill it in Excel and upload.</li>
+        <li>If any row breaks a rule, nothing is saved and every problem is listed.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2 id="limits">Limits</h2>
+  <p class="sub">What custom modules do not do.</p>
+  <div class="note"><b>No stock or accounting postings.</b>Custom records never change stock or the general ledger. Anything that must post to Inventory or Accounting is built as a code module (like Purchasing).</div>
+  <ul>
+    <li>Removing a field hides its values without deleting them.</li>
+    <li>A module or record type that still has records cannot be removed; deactivate the module instead.</li>
+  </ul>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK"><b>Setup &amp; Security</b><span>Roles, permissions, numbering</span></a>
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R"><b>Start here</b><span>How the modules connect</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Custom modules · updated November 6, 2026.</footer>
+</main>

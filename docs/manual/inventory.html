@@ -1,0 +1,167 @@
+<title>Strata Inventory Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Inventory</p>
+    <h1>Products, warehouses &amp; stock</h1>
+    <p class="lead">Inventory is the middle of Strata: Purchasing brings stock in, Sales takes it out, and every movement is valued in the books. Stock on hand is simply the sum of all movements.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL" aria-current="page">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#flow">How stock moves</a><a href="#screens">Each screen</a><a href="#howto">How to</a><a href="#connects">Connections</a></div>
+
+  <h2 id="flow">How stock moves</h2>
+  <p class="sub">Products and warehouses are the master data. Movements change the quantity. Stock on hand adds them up.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">Product</div><div class="q">What is it, and what does it cost?</div><div class="fx"><span class="chip none">master data</span></div></li>
+    <li><div class="doc">Warehouse</div><div class="q">Where is it kept, in which branch?</div><div class="fx"><span class="chip none">master data</span></div></li>
+    <li><div class="doc">Stock movement</div><div class="q">What came in or went out?</div><div class="fx"><span class="chip up">stock ±</span><span class="chip">journal entry</span></div></li>
+    <li><div class="doc">Stock on hand</div><div class="q">How much do we have now?</div><div class="fx"><span class="chip none">sum of movements</span></div></li>
+  </ol>
+
+  <h2 id="screens">Each screen</h2>
+  <p class="sub">Under the <b>Inventory</b> menu.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Products</h3>
+      <div class="menu">Inventory → Products</div>
+      <p>SKU, name, unit (pc, L, kg, box…), cost, selling price, reorder level and description. Untick <b>Active</b> to retire a product; products are never deleted.</p>
+      <ul>
+        <li><b>Cost</b> is what one unit is worth in the books. Receiving on a purchase order updates it to the moving average automatically.</li>
+        <li>Changing the cost by hand <b>revalues the stock on hand</b> in the books (the difference goes to inventory adjustments).</li>
+        <li><b>Selling price</b> is the default price on new sales invoices; it can be changed per invoice line.</li>
+        <li><b>Reorder level</b>: at or below this quantity the product shows as "Low" on Stock on hand and on the home page.</li>
+        <li>Each product has an <b>Attachments</b> tab for specs, photos and certificates. Products can be imported from Excel.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>Warehouses</h3>
+      <div class="menu">Inventory → Warehouses</div>
+      <p>Code, name, address and the <b>branch</b> it belongs to. Users only see the warehouses of their own branches.</p>
+      <ul>
+        <li>The warehouse decides the branch of every document that uses it: a sales invoice shipped from it, a PO delivered to it.</li>
+        <li>Untick <b>Active</b> to stop using a warehouse. Warehouses can be imported from Excel and have an Attachments tab.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Movements</h3>
+      <div class="menu">Inventory → Movements</div>
+      <p>Every change in quantity, numbered like <span class="mono">MOV-MNL-2026-000123</span> and dated the day it is posted. Four types:</p>
+      <div class="scroll" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Type</th><th>Use it for</th><th>Quantity</th><th>In the books</th></tr></thead>
+          <tbody>
+            <tr><th>Receipt</th><td>Stock arriving without a purchase order; opening stock (reference <span class="mono">OPENING</span>)</td><td>+</td><td>Inventory against payables, or against opening equity for <span class="mono">OPENING</span></td></tr>
+            <tr><th>Issue</th><td>Internal use, samples, write-offs</td><td>−</td><td>Inventory adjustments</td></tr>
+            <tr><th>Adjustment</th><td>Count differences (type + or −)</td><td>±</td><td>Inventory adjustments</td></tr>
+            <tr><th>Transfer</th><td>Moving stock between warehouses</td><td>− from, + to (one number)</td><td>Nothing inside a branch; inter-branch clearing between branches</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>Movements made by sales invoices and receiving reports appear here too, with the document number as reference.</li>
+        <li>A movement is never edited. Fix a mistake with an opposite adjustment.</li>
+        <li>Stock can never go below zero; an issue or transfer of more than is on hand is refused.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">4</div>
+    <div>
+      <h3>Stock on hand</h3>
+      <div class="menu">Inventory → Stock on hand</div>
+      <p>Quantity per product and warehouse, with branch, unit and <b>value at cost</b>. Filter by branch, warehouse or stock level (low / above reorder level) and export to Excel.</p>
+    </div>
+  </section>
+
+  <div class="note"><b>Item types and item classes</b>Setup → Inventory/WMS → Item Types and Item Classes hold your classification lists (e.g. Finished Goods › Chemicals › Degreaser). They are used by record types your administrator builds, such as an Item Master — see <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>.</div>
+
+  <h2 id="howto">How to</h2>
+  <p class="sub">The common jobs, step by step.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Load opening stock</h3>
+      <ol>
+        <li>Create the products and warehouses (or import them).</li>
+        <li>Inventory → Movements → New, type <b>Receipt</b>.</li>
+        <li>Enter the quantity and put <span class="mono">OPENING</span> as the reference.</li>
+        <li>For many products, import a movements file instead.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Move stock to another warehouse</h3>
+      <ol>
+        <li>Movements → New, type <b>Transfer</b>.</li>
+        <li>Choose the product, the source warehouse and <b>To warehouse</b>.</li>
+        <li>Enter the quantity and post. Both lines share one number.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Record a physical count difference</h3>
+      <ol>
+        <li>Compare the count with Stock on hand.</li>
+        <li>Movements → New, type <b>Adjustment</b>.</li>
+        <li>Enter the difference: positive if you found more, negative if less.</li>
+        <li>Write the count sheet number in Reference.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Find what needs reordering</h3>
+      <ol>
+        <li>Stock on hand → Filters → Stock level → Low.</li>
+        <li>Export the list if you need to send it.</li>
+        <li>Create purchase orders for those products (see <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>).</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2 id="connects">How Inventory connects</h2>
+  <p class="sub">Inventory is fed and drawn down by other modules.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Other module</th><th>What it does to Inventory</th></tr></thead>
+      <tbody>
+        <tr><th>Purchasing</th><td>Receiving a PO adds stock (a Receipt movement referenced by the receiving report) and updates each product's average cost.</td></tr>
+        <tr><th>Sales</th><td>Posting an invoice issues the stock (one Issue per line, referenced by the invoice). Voiding it brings the stock back.</td></tr>
+        <tr><th>Accounting</th><td>Every movement and cost change posts a journal entry, so the Inventory account always equals quantity × cost.</td></tr>
+        <tr><th>Finance</th><td>The dashboard shows inventory value at cost and days of stock.</td></tr>
+        <tr><th>Setup</th><td>Branches decide who sees which warehouses; document numbering sets the movement number format.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>Where stock comes from</span></a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Where stock goes</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>How stock is valued in the books</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Inventory · updated November 6, 2026.</footer>
+</main>

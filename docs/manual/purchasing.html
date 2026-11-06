@@ -1,0 +1,183 @@
+<title>Strata Purchasing Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Purchasing</p>
+    <h1>Buy → Receive → Bill → Pay</h1>
+    <p class="lead">Purchasing is one chain of documents. Each screen picks up where the previous one stopped, and each step updates stock, the books or cash on its own. Nobody re-types anything.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu" aria-current="page">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#flow">The chain</a><a href="#screens">Each screen</a><a href="#connects">Connections</a><a href="#week">A typical week</a><a href="#ideas">Ideas</a></div>
+
+  <h2 id="flow">The chain at a glance</h2>
+  <p class="sub">Five documents, each answering one question. The chips show what changes when you save it.</p>
+  <ol class="chain" style="--steps: 5">
+    <li><div class="doc">Supplier</div><div class="q">Who do we buy from?</div><div class="fx"><span class="chip none">master data</span></div></li>
+    <li><div class="doc">Purchase order</div><div class="q">What did we order?</div><div class="fx"><span class="chip none">nothing posted</span></div></li>
+    <li><div class="doc">Receiving report</div><div class="q">What actually arrived?</div><div class="fx"><span class="chip up">stock ↑</span><span class="chip up">cost updated</span></div></li>
+    <li><div class="doc">Supplier bill</div><div class="q">What did they charge?</div><div class="fx"><span class="chip up">we owe ↑</span><span class="chip up">input VAT</span></div></li>
+    <li><div class="doc">Payment made</div><div class="q">What did we pay?</div><div class="fx"><span class="chip down">cash ↓</span><span class="chip down">we owe ↓</span><span class="chip up">EWT for BIR</span></div></li>
+  </ol>
+
+  <h2 id="screens">Each screen</h2>
+  <p class="sub">In the order you would use them. The sixth screen, Payables, is a list that watches the other five.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Suppliers</h3>
+      <div class="menu">Purchasing → Suppliers</div>
+      <p>The supplier's record: code, registered name, TIN, address, payment terms, whether they are VAT-registered, and their default withholding (EWT) rate.</p>
+      <ul>
+        <li>These settings fill in every later document: <b>terms</b> set the bill's due date, <b>VAT status</b> decides if VAT is charged, the <b>EWT rate</b> is deducted when you pay.</li>
+        <li>The supplier page shows a <b>statement of account</b>: every bill and payment with a running balance, plus "We owe" and "Overdue".</li>
+        <li>Shortcut buttons: New PO, New bill, Pay bills.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>Purchase orders</h3>
+      <div class="menu">Purchasing → Purchase orders</div>
+      <p>What you asked the supplier for: products, quantities, unit cost (before VAT), the VAT type of each line, and the warehouse it should go to.</p>
+      <ul>
+        <li>Saving a PO <b>does not change stock or the books</b>. It is a commitment, not a transaction.</li>
+        <li>Status moves by itself: <span class="mono">Open → Partly received → Received</span>.</li>
+        <li>If the rest is not coming, <b>Close</b> the order. If nothing arrived, <b>Cancel</b> it. Orders are never edited.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Receiving reports</h3>
+      <div class="menu">Open a purchase order → Receive goods</div>
+      <p>Record what physically arrived. One order can be received in several deliveries.</p>
+      <ul>
+        <li><b>Stock goes up</b> in the order's warehouse right away (it appears under Inventory → Movements).</li>
+        <li>The product's <b>cost becomes the average</b> of the stock you had and the stock that arrived.</li>
+        <li>The books record goods you owe for but have not been billed for yet ("Goods received not invoiced").</li>
+        <li>Each line shows <b>Not billed</b> until a supplier bill covers it.</li>
+      </ul>
+      <div class="example">Example: 10 drums on hand at ₱100 + 5 arrive at ₱130 → 15 drums at <b>₱110</b> each.</div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">4</div>
+    <div>
+      <h3>Supplier bills</h3>
+      <div class="menu">Purchasing → Supplier bills → New</div>
+      <p>Enter the supplier's invoice when it arrives. Pick the supplier and branch, tick the received goods it covers, and add any expense lines (freight, repairs, rent).</p>
+      <ul>
+        <li>Records <b>input VAT</b> and the amount you now <b>owe</b> the supplier. The due date comes from the supplier's terms.</li>
+        <li>The supplier's invoice number is required and <b>cannot be entered twice</b>.</li>
+        <li>A bill with no payments can be <b>voided</b>; its goods can then be billed again.</li>
+        <li>Opening payables: enter a bill with an expense line against Opening balance equity.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">5</div>
+    <div>
+      <h3>Payments made</h3>
+      <div class="menu">Purchasing → Payments made → New</div>
+      <p>Pick a supplier, then how much to pay on each open bill. One payment can cover several bills of one branch, and part-payments are fine.</p>
+      <ul>
+        <li>Withholding tax is worked out for you and kept for the BIR.</li>
+        <li>Cash leaves the cash book, and what you owe goes down by the full amount (cash + withholding).</li>
+      </ul>
+      <div class="example">Example: bill of ₱3,472 (₱3,100 + ₱372 VAT) at 1% EWT → <b>₱31 withheld</b>, <b>₱3,441 paid</b> by check.</div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">6</div>
+    <div>
+      <h3>Payables</h3>
+      <div class="menu">Purchasing → Payables</div>
+      <p>Every unpaid bill, oldest due date first, with days overdue. Your "who do we pay this week" list. Filter by age, branch or supplier; export to Excel.</p>
+    </div>
+  </section>
+
+  <h2 id="connects">How Purchasing connects</h2>
+  <p class="sub">What each purchasing step does elsewhere in Strata, automatically.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Step</th><th>Inventory</th><th>Accounting (general ledger)</th><th>Finance</th></tr></thead>
+      <tbody>
+        <tr><th>Purchase order</th><td>Nothing yet</td><td>Nothing yet</td><td>—</td></tr>
+        <tr><th>Receiving report</th><td><span class="chip up">stock ↑</span><span class="chip up">product cost updated</span></td><td><span class="chip up">Inventory ↑</span><span class="chip up">Goods received not invoiced ↑</span></td><td>—</td></tr>
+        <tr><th>Supplier bill</th><td>—</td><td><span class="chip down">Goods received not invoiced ↓</span><span class="chip up">Expenses</span><span class="chip up">Input VAT ↑</span><span class="chip up">Accounts payable ↑</span></td><td>—</td></tr>
+        <tr><th>Payment made</th><td>—</td><td><span class="chip down">Accounts payable ↓</span><span class="chip down">Cash ↓</span><span class="chip up">Withholding tax payable ↑</span></td><td><span class="chip down">Cash book: money out</span><span class="chip down">Dashboard cash flow</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><b>Link to Sales:</b> you buy stock here at an average cost, then sell it under Sales. The sales invoice uses that cost for cost of goods sold and gross margin, so better purchase prices show up straight in your margins.</p>
+
+  <h2 id="week">A typical week</h2>
+  <p class="sub">The same chain, as it plays out in a real branch.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Order, receive, bill, pay</h3>
+      <ol>
+        <li>Stock is low, so you create a <b>purchase order</b> to ABC Trading for 100 drums.</li>
+        <li>60 drums arrive. Open the PO and <b>receive</b> 60. The PO shows "Partly received".</li>
+        <li>ABC's invoice comes in. Create a <b>bill</b>, tick the 60 drums and add the delivery fee.</li>
+        <li>On Friday check <b>Payables</b>, then record the <b>payment</b> with the check number.</li>
+        <li>The other 40 drums are not coming, so <b>close</b> the PO.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Pay a bill for a service (no goods)</h3>
+      <ol>
+        <li>Supplier bills → New, choose the supplier and branch.</li>
+        <li>Add an expense line: account (e.g. Rent and utilities), description, amount before VAT.</li>
+        <li>Check the withholding rate (e.g. 5% for rent) and post.</li>
+        <li>Pay it from the bill page with "Pay this bill".</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2 id="ideas">Ideas to make it stronger</h2>
+  <p class="sub">"Planned" items are already in the roadmap. "New" items are suggestions.</p>
+  <div class="ideas">
+    <div class="idea"><h3>Purchase requests <span class="tag new">New</span></h3><p>Staff ask for items; purchasing turns approved requests into POs.</p></div>
+    <div class="idea"><h3>PO approval by amount <span class="tag planned">Planned</span></h3><p>Orders over a limit wait for a manager.</p></div>
+    <div class="idea"><h3>Printed PO, receiving report, check voucher <span class="tag planned">Planned</span></h3><p>With your logo and colours from the Branding page.</p></div>
+    <div class="idea"><h3>Form 2307 printing <span class="tag planned">Planned</span></h3><p>Print the withholding certificate straight from a payment.</p></div>
+    <div class="idea"><h3>Reorder suggestions <span class="tag new">New</span></h3><p>Products below their reorder level become a draft PO in one click.</p></div>
+    <div class="idea"><h3>Supplier price history <span class="tag new">New</span></h3><p>Last price paid per product, with a warning when a PO price jumps.</p></div>
+    <div class="idea"><h3>Purchase returns <span class="tag new">New</span></h3><p>Send damaged goods back; stock and what you owe both go down.</p></div>
+    <div class="idea"><h3>Landed cost <span class="tag new">New</span></h3><p>Spread freight and duties into product cost instead of booking them as an expense.</p></div>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL"><b>Inventory</b><span>Where received goods go</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Payables, VAT and cash in the books</span></a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Selling what you bought</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Purchasing · updated November 6, 2026. Amounts on order and bill lines are entered net of VAT.</footer>
+</main>

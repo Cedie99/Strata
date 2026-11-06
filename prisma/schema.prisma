@@ -1,0 +1,758 @@
+// Database schema for my-erp. PostgreSQL, hosted on Supabase.
+// DATABASE_URL is the pooled connection the app uses; DIRECT_URL is the direct one for migrations.
+// Some values that could be enums or Json are stored as String (the schema started on SQLite).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ───────────────────────────── Core ─────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roles            UserRole[]
+  sessions         Session[]
+  auditLogs        AuditLog[]
+  stockMovements   StockMovement[]
+  customRecords    CustomRecord[]
+  branches         UserBranch[]
+  attachments      Attachment[]
+  salesInvoices    SalesInvoice[]
+  payments         Payment[]
+  cashEntries      CashEntry[]
+  journalEntries   JournalEntry[]
+  closedPeriods    AccountingPeriod[]
+  itemClasses      ItemClass[]
+  itemTypes        ItemType[]         @relation("ItemTypeUpdatedBy")
+  decidedRecords   CustomRecord[]     @relation("CustomRecordDecidedBy")
+  purchaseOrders   PurchaseOrder[]
+  goodsReceipts    GoodsReceipt[]
+  supplierBills    SupplierBill[]
+  supplierPayments SupplierPayment[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String   @default("")
+  // System roles (Administrator) cannot be deleted or stripped of permissions.
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+// Permission keys are defined in code by each module (src/modules/*/module.ts),
+// e.g. "inventory.products.manage". "*" means every permission.
+model RolePermission {
+  roleId     String
+  permission String
+  role       Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permission])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  // SHA-256 of the cookie token; the raw token is never stored.
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Append-only. Every write in the app records who did what, with before/after JSON.
+model AuditLog {
+  id       String   @id @default(cuid())
+  // Tamper evidence, set by the database on insert: seq orders the chain, hash = sha256(prevHash + this row).
+  seq      BigInt   @unique @default(0)
+  prevHash String   @default("")
+  hash     String   @default("")
+  at       DateTime @default(now())
+  userId   String?
+  action   String // create | update | delete | login | logout | ...
+  entity   String // e.g. "Product", "User"
+  entityId String?
+  before   String? // JSON
+  after    String? // JSON
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([at])
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+// A branch (site, region or company unit). Warehouses belong to one; users see the branches
+// they are assigned to, or all of them with the "admin.branches.all" permission.
+model Branch {
+  id        String   @id @default(cuid())
+  code      String   @unique // short, used in document numbers, e.g. "MNL"
+  name      String
+  address   String   @default("")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  users            UserBranch[]
+  warehouses       Warehouse[]
+  salesInvoices    SalesInvoice[]
+  cashEntries      CashEntry[]
+  journalLines     JournalLine[]
+  purchaseOrders   PurchaseOrder[]
+  goodsReceipts    GoodsReceipt[]
+  supplierBills    SupplierBill[]
+  supplierPayments SupplierPayment[]
+}
+
+model UserBranch {
+  userId   String
+  branchId String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@id([userId, branchId])
+}
+
+// How numbers for one kind of document look, e.g. MOV-MNL-2026-000123.
+// docType is "StockMovement" or "custom:<entityId>" (see src/core/numbering.ts).
+model DocumentSeries {
+  docType   String  @id
+  name      String
+  prefix    String
+  padding   Int     @default(6)
+  perBranch Boolean @default(true) // separate counter (and branch code) per branch
+  yearly    Boolean @default(true) // counter restarts every year
+
+  counters DocumentCounter[]
+}
+
+// Next free number per series, branch and year. Incremented inside the same transaction
+// as the document, so a rolled-back save does not leave a gap.
+model DocumentCounter {
+  docType    String
+  branchCode String         @default("") // "" when the series is not per branch
+  year       Int            @default(0) // 0 when the series is not yearly
+  next       Int            @default(1)
+  series     DocumentSeries @relation(fields: [docType], references: [docType], onDelete: Cascade)
+
+  @@id([docType, branchCode, year])
+}
+
+// A file attached to any record. entity + entityId point at the record, e.g. ("Product", id)
+// or ("CustomRecord", id); src/modules/attachments.ts decides who may see and change them.
+model Attachment {
+  id           String   @id @default(cuid())
+  entity       String
+  entityId     String
+  fileName     String
+  contentType  String
+  size         Int
+  storageKey   String   @unique
+  uploadedById String?
+  createdAt    DateTime @default(now())
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+}
+
+// ─────────────────────────── Inventory ───────────────────────────
+
+model Product {
+  id           String   @id @default(cuid())
+  sku          String   @unique
+  name         String
+  description  String   @default("")
+  unit         String   @default("pc") // pc, L, kg, box ...
+  cost         Decimal  @default(0)
+  price        Decimal  @default(0)
+  reorderLevel Decimal  @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  movements          StockMovement[]
+  invoiceLines       SalesInvoiceLine[]
+  journalLines       JournalLine[]
+  purchaseOrderLines PurchaseOrderLine[]
+  goodsReceiptLines  GoodsReceiptLine[]
+  supplierBillLines  SupplierBillLine[]
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  address   String   @default("")
+  branchId  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  branch         Branch          @relation(fields: [branchId], references: [id])
+  movements      StockMovement[]
+  salesInvoices  SalesInvoice[]
+  purchaseOrders PurchaseOrder[]
+  goodsReceipts  GoodsReceipt[]
+
+  @@index([branchId])
+}
+
+// Stock is a ledger: on-hand = SUM(qty) per product and warehouse.
+// Movements are never edited; mistakes are fixed with an ADJUSTMENT.
+model StockMovement {
+  id          String   @id @default(cuid())
+  // Document number, e.g. MOV-MNL-2026-000001. Both lines of a transfer share one number.
+  number      String   @default("")
+  productId   String
+  warehouseId String
+  qty         Decimal // signed: + in, - out
+  type        String // RECEIPT | ISSUE | ADJUSTMENT | TRANSFER_IN | TRANSFER_OUT
+  reference   String   @default("")
+  note        String   @default("")
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+  createdBy User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([productId, warehouseId])
+  @@index([createdAt])
+  @@index([number])
+}
+
+// Item types (Finished Goods, Raw Materials, …), maintained under Setup › Inventory/WMS › Item Types.
+// Records link to them by id, so renaming a type changes it everywhere.
+model ItemType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  classes   ItemClass[]
+  updatedBy User?       @relation("ItemTypeUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+// Item classes: a tree under each item type, e.g. Finished Goods › CHEMICALS › DEGREASER.
+// Top-level classes have no parent; children always share their parent's item type.
+// Descriptions are unique among siblings (checked in the action: Postgres treats NULL parents as distinct).
+model ItemClass {
+  id          String   @id @default(cuid())
+  itemTypeId  String
+  parentId    String?
+  description String
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  itemType  ItemType    @relation(fields: [itemTypeId], references: [id], onDelete: Restrict)
+  parent    ItemClass?  @relation("ItemClassTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children  ItemClass[] @relation("ItemClassTree")
+  updatedBy User?       @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([itemTypeId, parentId])
+}
+
+// ───────────────────────────── Sales ─────────────────────────────
+// Dates are stored as local midnight of the day entered (like the list date filters), not @db.Date,
+// so a day never shifts across the UTC boundary.
+
+model Customer {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  email     String   @default("")
+  phone     String   @default("")
+  address   String   @default("")
+  termsDays Int      @default(30) // invoice due date = invoice date + terms
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices     SalesInvoice[]
+  journalLines JournalLine[]
+}
+
+// A posted sales invoice. Posting issues the stock from the warehouse (one ISSUE movement per line,
+// referenced by the invoice number); voiding receives it back. Invoices are never edited.
+model SalesInvoice {
+  id          String    @id @default(cuid())
+  number      String    @unique // e.g. INV-MNL-2026-000001
+  customerId  String
+  branchId    String // the warehouse's branch
+  warehouseId String
+  date        DateTime
+  dueDate     DateTime
+  status      String    @default("POSTED") // POSTED | VOID
+  total       Decimal // sum of line amounts
+  costTotal   Decimal // sum of qty × cost at posting; gross profit = total − costTotal
+  reference   String    @default("") // customer PO, DR number …
+  note        String    @default("")
+  createdById String?
+  createdAt   DateTime  @default(now())
+  voidedAt    DateTime?
+
+  customer  Customer           @relation(fields: [customerId], references: [id])
+  branch    Branch             @relation(fields: [branchId], references: [id])
+  warehouse Warehouse          @relation(fields: [warehouseId], references: [id])
+  createdBy User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines     SalesInvoiceLine[]
+  payments  Payment[]
+
+  @@index([branchId, date])
+  @@index([customerId])
+  @@index([status, dueDate])
+}
+
+model SalesInvoiceLine {
+  id        String  @id @default(cuid())
+  invoiceId String
+  productId String
+  qty       Decimal
+  unitPrice Decimal
+  unitCost  Decimal // the product's cost when the invoice was posted
+  amount    Decimal // qty × unitPrice
+
+  invoice SalesInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product      @relation(fields: [productId], references: [id])
+
+  @@index([invoiceId])
+  @@index([productId])
+}
+
+// Money received against one invoice. Several partial payments may settle an invoice.
+// Payments count as cash in for the invoice's branch.
+model Payment {
+  id          String   @id @default(cuid())
+  number      String   @unique // e.g. PAY-MNL-2026-000001
+  invoiceId   String
+  date        DateTime
+  amount      Decimal
+  method      String // CASH | CHECK | BANK_TRANSFER | CARD | OTHER
+  reference   String   @default("") // check or transfer number
+  note        String   @default("")
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  invoice   SalesInvoice @relation(fields: [invoiceId], references: [id])
+  createdBy User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([date])
+}
+
+// ──────────────────────────── Finance ────────────────────────────
+
+// Cash book: money in and out other than customer payments (expenses, supplier payments, capital,
+// opening balance). Cash flow = payments received + cash IN − cash OUT. Entries are never edited;
+// correct a mistake with an opposite entry.
+model CashEntry {
+  id          String   @id @default(cuid())
+  number      String   @unique // e.g. CSH-MNL-2026-000001
+  branchId    String
+  date        DateTime
+  direction   String // IN | OUT
+  category    String
+  amount      Decimal // always positive; direction decides the sign
+  reference   String   @default("")
+  note        String   @default("")
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  branch    Branch @relation(fields: [branchId], references: [id])
+  createdBy User?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([branchId, date])
+}
+
+// ─────────────────────────── Accounting ───────────────────────────
+// Double-entry general ledger. Every posting document (invoice, void, payment, cash entry, stock movement,
+// cost change) writes one balanced JournalEntry in the same transaction, so the books always match the
+// documents. Entries are never edited or deleted (the database refuses it); mistakes are reversed.
+
+model Account {
+  id        String   @id @default(cuid())
+  code      String   @unique // e.g. "1100"
+  name      String
+  type      String // ASSET | LIABILITY | EQUITY | INCOME | EXPENSE
+  // Accounts the system posts to automatically (e.g. "AR", "SALES"); their type cannot change.
+  systemKey String?  @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  lines             JournalLine[]
+  supplierBillLines SupplierBillLine[]
+}
+
+model JournalEntry {
+  id           String   @id @default(cuid())
+  number       String   @unique // e.g. JE-MAIN-2026-000001
+  date         DateTime // accounting date, local midnight (see the note on Sales)
+  // What created it: SalesInvoice | SalesInvoiceVoid | Payment | CashEntry | StockMovement | CostChange | Manual | Reversal
+  sourceType   String
+  sourceId     String? // id of that document (none for manual entries)
+  sourceNumber String   @default("") // its document number, for searching and the trail
+  memo         String   @default("")
+  reversalOfId String?  @unique // set on the entry that reverses another
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  lines      JournalLine[]
+  createdBy  User?         @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  reversalOf JournalEntry? @relation("Reversal", fields: [reversalOfId], references: [id])
+  reversedBy JournalEntry? @relation("Reversal")
+
+  @@unique([sourceType, sourceId])
+  @@index([date])
+  @@index([sourceNumber])
+}
+
+model JournalLine {
+  id         String  @id @default(cuid())
+  entryId    String
+  accountId  String
+  branchId   String
+  debit      Decimal @default(0)
+  credit     Decimal @default(0)
+  customerId String? // receivable lines: which customer (the AR sub-ledger)
+  productId  String? // inventory lines: which product
+  supplierId String? // payable lines: which supplier (the AP sub-ledger)
+  memo       String  @default("")
+
+  entry    JournalEntry @relation(fields: [entryId], references: [id])
+  account  Account      @relation(fields: [accountId], references: [id])
+  branch   Branch       @relation(fields: [branchId], references: [id])
+  customer Customer?    @relation(fields: [customerId], references: [id])
+  product  Product?     @relation(fields: [productId], references: [id])
+  supplier Supplier?    @relation(fields: [supplierId], references: [id])
+
+  @@index([entryId])
+  @@index([accountId, branchId])
+  @@index([customerId])
+  @@index([supplierId])
+}
+
+// A closed month accepts no postings dated in it (checked by the app and enforced by a database trigger).
+model AccountingPeriod {
+  year       Int
+  month      Int // 1–12
+  status     String    @default("OPEN") // OPEN | CLOSED
+  closedById String?
+  closedAt   DateTime?
+
+  closedBy User? @relation(fields: [closedById], references: [id], onDelete: Restrict)
+
+  @@id([year, month])
+}
+
+// ─────────────────────────── Purchasing ───────────────────────────
+// Buy → receive → bill → pay. Amounts on lines are net of VAT; VAT is worked out per line from its
+// vatCode (VAT = 12%, ZERO = zero-rated, EXEMPT = exempt or bought from a non-VAT supplier).
+// Receiving brings stock in at the PO cost (moving average) against "goods received not invoiced";
+// the supplier's bill moves that to accounts payable with input VAT; payments settle bills, net of the
+// expanded withholding tax (EWT) kept for the BIR. Posted documents are never edited (database guards).
+
+model Supplier {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  tin           String   @default("") // e.g. 123-456-789-00000; needed on Form 2307 and the purchases list
+  email         String   @default("")
+  phone         String   @default("")
+  address       String   @default("")
+  termsDays     Int      @default(30) // bill due date = bill date + terms
+  vatRegistered Boolean  @default(true) // false: its bills carry no input VAT
+  ewtRate       Decimal  @default(0) // default expanded withholding rate in percent, e.g. 1 (goods) or 2 (services)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  purchaseOrders PurchaseOrder[]
+  goodsReceipts  GoodsReceipt[]
+  bills          SupplierBill[]
+  payments       SupplierPayment[]
+  journalLines   JournalLine[]
+}
+
+// Status follows the receipts: OPEN → PARTIAL → RECEIVED; CLOSED = short-closed by a user, CANCELLED = never received.
+model PurchaseOrder {
+  id           String    @id @default(cuid())
+  number       String    @unique // e.g. PO-MNL-2026-000001
+  supplierId   String
+  branchId     String // the warehouse's branch
+  warehouseId  String // where the goods are expected
+  date         DateTime
+  expectedDate DateTime?
+  status       String    @default("OPEN") // OPEN | PARTIAL | RECEIVED | CLOSED | CANCELLED
+  subtotal     Decimal // net of VAT
+  vat          Decimal
+  total        Decimal
+  reference    String    @default("") // supplier quotation …
+  note         String    @default("")
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  closedAt     DateTime?
+
+  supplier  Supplier            @relation(fields: [supplierId], references: [id])
+  branch    Branch              @relation(fields: [branchId], references: [id])
+  warehouse Warehouse           @relation(fields: [warehouseId], references: [id])
+  createdBy User?               @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines     PurchaseOrderLine[]
+  receipts  GoodsReceipt[]
+
+  @@index([branchId, date])
+  @@index([supplierId])
+  @@index([status])
+}
+
+model PurchaseOrderLine {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  qty       Decimal
+  unitCost  Decimal // net of VAT
+  vatCode   String  @default("VAT") // VAT | ZERO | EXEMPT
+  amount    Decimal // qty × unitCost
+  vat       Decimal
+
+  order        PurchaseOrder      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product            @relation(fields: [productId], references: [id])
+  receiptLines GoodsReceiptLine[]
+
+  @@index([orderId])
+}
+
+// A receiving report: goods that arrived against a PO. Its stock comes in as RECEIPT movements referenced by its number.
+model GoodsReceipt {
+  id          String   @id @default(cuid())
+  number      String   @unique // e.g. RR-MNL-2026-000001
+  orderId     String
+  supplierId  String
+  branchId    String
+  warehouseId String
+  date        DateTime
+  total       Decimal // net value received (qty × PO cost)
+  reference   String   @default("") // supplier delivery receipt number
+  note        String   @default("")
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  order     PurchaseOrder      @relation(fields: [orderId], references: [id])
+  supplier  Supplier           @relation(fields: [supplierId], references: [id])
+  branch    Branch             @relation(fields: [branchId], references: [id])
+  warehouse Warehouse          @relation(fields: [warehouseId], references: [id])
+  createdBy User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines     GoodsReceiptLine[]
+
+  @@index([orderId])
+  @@index([supplierId])
+  @@index([branchId, date])
+}
+
+model GoodsReceiptLine {
+  id          String  @id @default(cuid())
+  receiptId   String
+  orderLineId String
+  productId   String
+  qty         Decimal
+  unitCost    Decimal // the PO line's cost, net of VAT
+  vatCode     String
+  amount      Decimal // qty × unitCost
+
+  receipt   GoodsReceipt       @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  orderLine PurchaseOrderLine  @relation(fields: [orderLineId], references: [id])
+  product   Product            @relation(fields: [productId], references: [id])
+  billLines SupplierBillLine[]
+
+  @@index([receiptId])
+  @@index([orderLineId])
+}
+
+// The supplier invoice, entered as an accounts payable voucher. Lines either bill received goods
+// (receiptLineId) or record a direct expense (accountId). Voiding is allowed only while nothing is paid.
+model SupplierBill {
+  id                String    @id @default(cuid())
+  number            String    @unique // e.g. APV-MNL-2026-000001
+  supplierId        String
+  branchId          String
+  supplierInvoiceNo String // the supplier invoice / receipt number (for the BIR purchases list)
+  date              DateTime // date on the supplier invoice
+  dueDate           DateTime
+  status            String    @default("POSTED") // POSTED | VOID
+  subtotal          Decimal // net of VAT
+  vat               Decimal // input VAT
+  total             Decimal // what is owed before withholding
+  ewtRate           Decimal   @default(0) // percent withheld from payments of this bill
+  atc               String    @default("") // BIR alphanumeric tax code of the withholding, e.g. WC158
+  note              String    @default("")
+  createdById       String?
+  createdAt         DateTime  @default(now())
+  voidedAt          DateTime?
+
+  supplier    Supplier              @relation(fields: [supplierId], references: [id])
+  branch      Branch                @relation(fields: [branchId], references: [id])
+  createdBy   User?                 @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines       SupplierBillLine[]
+  allocations SupplierPaymentLine[]
+
+  @@index([branchId, date])
+  @@index([supplierId])
+  @@index([status, dueDate])
+}
+
+model SupplierBillLine {
+  id            String  @id @default(cuid())
+  billId        String
+  receiptLineId String? // billing received goods
+  accountId     String? // a direct expense (no goods received)
+  productId     String?
+  description   String  @default("")
+  qty           Decimal
+  unitCost      Decimal // net of VAT
+  vatCode       String
+  amount        Decimal // net
+  vat           Decimal
+
+  bill        SupplierBill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  receiptLine GoodsReceiptLine? @relation(fields: [receiptLineId], references: [id])
+  account     Account?          @relation(fields: [accountId], references: [id])
+  product     Product?          @relation(fields: [productId], references: [id])
+
+  @@index([billId])
+  @@index([receiptLineId])
+}
+
+// Money paid to a supplier (check / disbursement voucher), settling one or more of its bills in one branch.
+// gross = what the bills are reduced by; ewt = tax withheld for the BIR; net = what actually leaves the bank.
+model SupplierPayment {
+  id          String   @id @default(cuid())
+  number      String   @unique // e.g. CV-MNL-2026-000001
+  supplierId  String
+  branchId    String
+  date        DateTime
+  method      String // CASH | CHECK | BANK_TRANSFER | CARD | OTHER
+  reference   String   @default("") // check or transfer number
+  note        String   @default("")
+  gross       Decimal
+  ewt         Decimal
+  net         Decimal
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  supplier  Supplier              @relation(fields: [supplierId], references: [id])
+  branch    Branch                @relation(fields: [branchId], references: [id])
+  createdBy User?                 @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  lines     SupplierPaymentLine[]
+
+  @@index([supplierId])
+  @@index([branchId, date])
+}
+
+model SupplierPaymentLine {
+  id        String  @id @default(cuid())
+  paymentId String
+  billId    String
+  amount    Decimal // applied to the bill (cash + withholding)
+  ewt       Decimal // withheld on this part of the bill
+
+  payment SupplierPayment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  bill    SupplierBill    @relation(fields: [billId], references: [id])
+
+  @@index([paymentId])
+  @@index([billId])
+}
+
+// ───────────────────────── Custom modules ─────────────────────────
+// Modules an administrator builds in the UI (Administration → Modules).
+// Each has record types ("entities") with admin-defined fields; records store
+// their values as JSON. Permissions are "custom.<slug>.view" and "custom.<slug>.manage".
+
+model CustomModule {
+  id          String   @id @default(cuid())
+  // Used in URLs (/m/<slug>) and permission keys, so it never changes after creation.
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  // "" = the module gets its own menu; otherwise the id of a built-in module (e.g. "inventory")
+  // whose menu its record types appear in.
+  menu        String   @default("")
+  // When placed in another menu, its record types sit in a ► submenu: menuGroup if set (modules with the
+  // same name share it), otherwise one named after the module. menuFlat lists them directly instead.
+  menuGroup   String   @default("")
+  menuFlat    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  entities CustomEntity[]
+}
+
+model CustomEntity {
+  id         String  @id @default(cuid())
+  moduleId   String
+  slug       String
+  name       String // plural label shown in the sidebar, e.g. "Vehicles"
+  sortOrder  Int     @default(0)
+  fields     String  @default("[]") // JSON: CustomField[] (see src/modules/custom/fields.ts)
+  // "sections" = one long form with jump links; "tabs" = each section heading becomes a tab.
+  formLayout String  @default("sections")
+  rules      String  @default("[]") // JSON: { check, message }[]: formulas every saved record must satisfy
+  // When on, new and changed records wait as PENDING until someone with "Approve records" decides.
+  approval   Boolean @default(false)
+
+  module  CustomModule   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  records CustomRecord[]
+
+  @@unique([moduleId, slug])
+}
+
+model CustomRecord {
+  id           String    @id @default(cuid())
+  entityId     String
+  data         String    @default("{}") // JSON: { [fieldKey]: string | boolean | string[] }
+  // "" when its record type needs no approval; otherwise PENDING, APPROVED or REJECTED.
+  status       String    @default("")
+  decidedById  String?
+  decidedAt    DateTime?
+  decisionNote String    @default("")
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  entity    CustomEntity @relation(fields: [entityId], references: [id])
+  createdBy User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  decidedBy User?        @relation("CustomRecordDecidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([entityId, createdAt])
+}

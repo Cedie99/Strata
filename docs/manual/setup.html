@@ -1,0 +1,184 @@
+<title>Strata Setup &amp; Security Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Setup &amp; Security</p>
+    <h1>Who does what, where</h1>
+    <p class="lead">Setup is for administrators. It decides who can sign in, what each person may see and do, which branches they work in, how documents are numbered, and how the system looks.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK" aria-current="page">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#access">How access works</a><a href="#global">Global setup</a><a href="#security">Security</a><a href="#permissions">Permissions list</a><a href="#howto">How to</a></div>
+
+  <h2 id="access">How access works</h2>
+  <p class="sub">Three things decide what a person sees: their roles, their branches, and whether their account is active.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">User</div><div class="q">Who is signing in?</div><div class="fx"><span class="chip none">email + password</span></div></li>
+    <li><div class="doc">Roles</div><div class="q">What may they do?</div><div class="fx"><span class="chip">permissions</span></div></li>
+    <li><div class="doc">Branches</div><div class="q">Where may they do it?</div><div class="fx"><span class="chip">warehouses &amp; documents</span></div></li>
+    <li><div class="doc">Menus &amp; buttons</div><div class="q">What they actually see</div><div class="fx"><span class="chip none">checked on the server</span></div></li>
+  </ol>
+  <div class="note"><b>Hiding is not the only protection.</b>Every page and every save checks the permission again on the server, so a user cannot reach a screen by typing its address.</div>
+
+  <h2 id="global">Global setup</h2>
+  <p class="sub">Under <b>Setup → Global Setup</b>.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Company settings</h3>
+      <div class="menu">Setup → Global Setup ► Company settings</div>
+      <p>Company name (shown as "Licensed to"), currency code (e.g. PHP) and address (shown on the sign-in page).</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>Branding</h3>
+      <div class="menu">Setup → Global Setup ► Branding</div>
+      <p>The system's identity: name, tagline, sign-in headline, logo (also the browser tab icon), typefaces and the full colour palette. A live preview shows the result before saving and warns about hard-to-read colour pairs. <b>Reset to defaults</b> brings back the built-in look.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Branches</h3>
+      <div class="menu">Setup → Global Setup ► Branches</div>
+      <p>Sites, regions or company units, each with a short code (e.g. MNL) used in document numbers. Every warehouse belongs to a branch; documents belong to the branch of their warehouse.</p>
+      <ul>
+        <li>Users see only the branches assigned to them on their user page.</li>
+        <li>The permission "See all branches" lifts that limit.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">4</div>
+    <div>
+      <h3>Document numbering</h3>
+      <div class="menu">Setup → Global Setup ► Document numbering</div>
+      <p>The format of every numbered document: prefix, number of digits, whether the counter is per branch and whether it restarts each year. Changes apply to new documents only.</p>
+      <div class="example">Default formats: <span class="mono">MOV</span> stock movements · <span class="mono">INV</span> sales invoices · <span class="mono">PAY</span> payments received · <span class="mono">CSH</span> cash book · <span class="mono">JE</span> journal entries · <span class="mono">PO</span> purchase orders · <span class="mono">RR</span> receiving reports · <span class="mono">APV</span> supplier bills · <span class="mono">CV</span> payments made. Example: <span class="mono">INV-MNL-2026-000001</span>.</div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">5</div>
+    <div>
+      <h3>Inventory/WMS lists</h3>
+      <div class="menu">Setup → Inventory/WMS ► Item Types · Item Classes</div>
+      <p>Classification lists: item types (Finished Goods, Raw Materials…) and a tree of item classes under each. Used by record types built in <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>.</p>
+    </div>
+  </section>
+
+  <h2 id="security">Security</h2>
+  <p class="sub">Under <b>Setup → Security</b>.</p>
+
+  <section class="screen">
+    <div class="n">6</div>
+    <div>
+      <h3>Users</h3>
+      <div class="menu">Setup → Security ► Users</div>
+      <p>Name, email, password, active, roles and branches. Deactivating a user signs them out everywhere at once. You cannot deactivate yourself.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">7</div>
+    <div>
+      <h3>Roles</h3>
+      <div class="menu">Setup → Security ► Roles</div>
+      <p>A role is a named set of permissions, ticked per module. Give people roles, not individual permissions. Starting roles: Administrator (everything), Inventory Clerk, Sales Clerk, Finance and Accountant. Add your own for each job.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">8</div>
+    <div>
+      <h3>Audit log</h3>
+      <div class="menu">Setup → Security ► Audit log</div>
+      <p>Every change: who, when, what, with the values before and after. Each entry is chained to the previous one by a fingerprint. <b>Verify the log has not been tampered with</b> checks the whole chain and reports the first entry that was altered, if any.</p>
+    </div>
+  </section>
+
+  <h2 id="permissions">Permissions list</h2>
+  <p class="sub">What you can tick on a role, by module.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Module</th><th>Permissions</th></tr></thead>
+      <tbody>
+        <tr><th>Inventory</th><td>View products, warehouses and stock · Create and edit products · Create and edit warehouses · Post stock movements · Create, edit and delete item types and classes</td></tr>
+        <tr><th>Sales</th><td>View customers, invoices and payments · Create and edit customers · Post and void sales invoices · Record payments received</td></tr>
+        <tr><th>Purchasing</th><td>View suppliers, purchase orders, bills and payments · Create and edit suppliers · Create, close and cancel purchase orders · Receive goods · Post and void supplier bills · Record payments to suppliers</td></tr>
+        <tr><th>Finance</th><td>View the business dashboard and cash book · Record cash in and out</td></tr>
+        <tr><th>Accounting</th><td>View the ledger, journals and statements · Change the chart of accounts · Post and reverse manual journals · Close and reopen periods</td></tr>
+        <tr><th>Setup</th><td>View users · Create and edit users · Manage roles · Build custom modules · Create and edit branches · See all branches · Change document numbering · View audit log · Change company settings · Change branding</td></tr>
+        <tr><th>Custom modules</th><td>Per module: view records · create and edit records · approve records</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="howto">How to</h2>
+  <p class="sub">The common jobs, step by step.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Add a new employee</h3>
+      <ol>
+        <li>Setup → Security ► Users → New.</li>
+        <li>Enter name, email and a starting password (8+ characters).</li>
+        <li>Tick their roles and the branches they work in.</li>
+        <li>Ask them to sign in and keep the password private.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Separate duties (maker / checker)</h3>
+      <ol>
+        <li>Create roles such as "Purchasing Clerk" (create POs, receive) and "AP Officer" (post bills, pay).</li>
+        <li>Do not give one person both posting and approval rights on the same documents.</li>
+        <li>Keep "Close and reopen periods" to the accountant.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Open a new branch</h3>
+      <ol>
+        <li>Setup → Branches → New, with a short code.</li>
+        <li>Inventory → Warehouses → New, in that branch.</li>
+        <li>Assign the branch to its users.</li>
+        <li>Load its opening stock (see <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>).</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Someone leaves the company</h3>
+      <ol>
+        <li>Open their user and untick Active. They are signed out at once.</li>
+        <li>Their past work keeps their name in documents and the audit log.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R"><b>Start here</b><span>How the modules connect</span></a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW"><b>Custom modules</b><span>Build your own records and menus</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Period close and the audit trail</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Setup &amp; Security · updated November 6, 2026.</footer>
+</main>
