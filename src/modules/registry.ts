@@ -9,6 +9,7 @@ import { financeModule } from "./finance/module";
 import { inventoryModule } from "./inventory/module";
 import { purchasingModule } from "./purchasing/module";
 import { salesModule } from "./sales/module";
+import { approvalsModule } from "./approvals/module";
 import { taxModule } from "./tax/module";
 
 /**
@@ -20,7 +21,7 @@ import { taxModule } from "./tax/module";
  * the database and merged in by getModules(). They get their own menu, or appear inside a
  * built-in module's menu (e.g. an "Item Master" under Inventory).
  */
-export const BUILT_IN_MODULES: ModuleDefinition[] = [inventoryModule, salesModule, purchasingModule, financeModule, accountingModule, taxModule, adminModule];
+export const BUILT_IN_MODULES: ModuleDefinition[] = [inventoryModule, salesModule, purchasingModule, financeModule, accountingModule, taxModule, approvalsModule, adminModule];
 
 /** Every installed module: built-in ones plus active admin-built ones (memoised per request). */
 export const getModules = cache(async (): Promise<ModuleDefinition[]> => {

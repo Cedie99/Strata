@@ -18,6 +18,7 @@
     <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
     <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
     <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
+    <a href="https://claude.ai/artifact/E2qB5FBAt7r3qLd7WJcT7a">Approvals</a>
     <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
     <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
   </div>
@@ -48,6 +49,7 @@
         <li><b>VAT on sales to them</b>: VATable 12%, zero-rated (e.g. PEZA, export) or exempt. New invoice lines start with it.</li>
         <li><b>They withhold (%)</b> and <b>Withholding ATC</b>: if the customer deducts tax from payments and gives you Form 2307 (e.g. 1%, WC158), payments suggest that amount.</li>
         <li>The TIN appears on printed invoices, the sales book, the SLS and the SAWT.</li>
+        <li><b>Credit limit</b>: the most the customer may owe at once (0 = no limit). An approval rule can hold invoices that go over it.</li>
         <li>The customer page shows what they <b>owe</b>, how much is <b>overdue</b>, and all their invoices with balances.</li>
         <li>"New invoice" on the customer page starts an invoice with that customer filled in.</li>
         <li><b>Statement of account</b> on the customer page prints every open invoice with days overdue, an aging summary and the total due.</li>
@@ -99,6 +101,8 @@
 
   <div class="note"><b>Official invoices.</b>Strata's printed invoices are internal copies until it is registered with the BIR; official invoices still come from your registered system. Record its invoice number in Reference. Invoices posted before VAT on sales was added count as exempt sales with no VAT. See <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a> for the sales book, SLS and SAWT.</div>
 
+  <div class="note"><b>May need approval.</b>Sales invoices priced below cost, with a discount above the allowed percent, or that take a customer over their credit limit; and voiding an invoice. If your administrator has set an approval rule for it, saving sends it for approval instead of posting it: you land on the request, and it is posted only after the last approver says yes. See <a href="https://claude.ai/artifact/E2qB5FBAt7r3qLd7WJcT7a">Approvals</a>.</div>
+
   <h2 id="howto">How to</h2>
   <p class="sub">The common jobs, step by step.</p>
   <div class="howtos">
@@ -124,7 +128,7 @@
       <h3>Cancel a wrong invoice</h3>
       <ol>
         <li>Open the invoice. It must have no payments.</li>
-        <li>Click <b>Void invoice</b> and confirm.</li>
+        <li>Click <b>Void invoice</b> and confirm. If voids need approval, it waits until approved.</li>
         <li>The stock is received back; post a corrected invoice.</li>
         <li>If its month is closed, ask accounting: the correction belongs in an open month.</li>
       </ol>

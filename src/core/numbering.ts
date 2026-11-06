@@ -14,6 +14,7 @@ export const BUILT_IN_SERIES: Record<string, SeriesDefaults> = {
   GoodsReceipt: { name: "Receiving reports", prefix: "RR", perBranch: true, yearly: true },
   SupplierBill: { name: "Supplier bills (AP vouchers)", prefix: "APV", perBranch: true, yearly: true },
   SupplierPayment: { name: "Payments made (check vouchers)", prefix: "CV", perBranch: true, yearly: true },
+  ApprovalRequest: { name: "Approval requests", prefix: "APR", perBranch: true, yearly: true },
 };
 
 /** Series for an admin-built record type with an "Auto number" field. Custom records have no branch. */

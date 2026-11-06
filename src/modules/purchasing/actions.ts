@@ -9,9 +9,10 @@ import { getBranchScope } from "@/core/branches";
 import { db } from "@/core/db";
 import { formObject, fromZod, type ActionState } from "@/core/forms";
 import { runPosting } from "@/core/posting";
+import { submit } from "@/modules/approvals/engine";
 import { P } from "./module";
-import { finishOrder, postBill, postOrder, postSupplierPayment, receiveOrder, voidBill } from "./posting";
-import { billSchema, orderSchema, receiptSchema, supplierPaymentSchema, supplierSchema } from "./schemas";
+import { finishOrder, postBill, receiveOrder } from "./posting";
+import { billSchema, receiptSchema, supplierSchema } from "./schemas";
 
 const isUniqueViolation = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
 
@@ -49,14 +50,12 @@ export async function saveSupplier(id: string | null, _state: ActionState, formD
 
 export async function saveOrder(_state: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requirePermission(P.ordersManage);
-  const parsed = orderSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fromZod(parsed.error);
   const scope = await getBranchScope();
-
-  const result = await runPosting((tx) => postOrder(tx, user.id, parsed.data, scope.mayUse));
-  if ("error" in result) return { error: result.error };
-  revalidatePath("/purchasing", "layout");
-  redirect(`/purchasing/orders/${result.value.id}`);
+  // Posted at once, or sent for approval when an approval rule matches.
+  const result = await submit("PurchaseOrder", formObject(formData), user, scope);
+  if ("state" in result) return result.state;
+  revalidatePath("/", "layout");
+  redirect(result.redirect);
 }
 
 export async function closeOrder(id: string, how: "CLOSED" | "CANCELLED"): Promise<ActionState> {
@@ -99,22 +98,20 @@ export async function saveBill(_state: ActionState, formData: FormData): Promise
 export async function cancelBill(id: string): Promise<ActionState> {
   const user = await requirePermission(P.billsPost);
   const scope = await getBranchScope();
-  const result = await runPosting((tx) => voidBill(tx, user.id, id, scope.mayUse));
-  if ("error" in result) return { error: result.error };
+  const result = await submit("BillVoid", { id }, user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/", "layout");
-  return { ok: `${result.value.number} is void.` };
+  if (!result.posted) redirect(result.redirect);
+  return { ok: "The bill is void." };
 }
 
 // ─────────────── Payments made ───────────────
 
 export async function saveSupplierPayment(_state: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requirePermission(P.paymentsPost);
-  const parsed = supplierPaymentSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fromZod(parsed.error);
   const scope = await getBranchScope();
-
-  const result = await runPosting((tx) => postSupplierPayment(tx, user.id, parsed.data, scope.mayUse));
-  if ("error" in result) return { error: result.error };
+  const result = await submit("SupplierPayment", formObject(formData), user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/", "layout");
-  redirect(`/purchasing/payments/${result.value.id}`);
+  redirect(result.redirect);
 }

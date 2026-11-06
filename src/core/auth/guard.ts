@@ -24,8 +24,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   };
 });
 
+/** An empty permission means "any signed-in user" (e.g. the approvals inbox). */
 export function can(user: CurrentUser | null, permission: string) {
-  return !!user && (user.permissions.has("*") || user.permissions.has(permission));
+  return !!user && (permission === "" || user.permissions.has("*") || user.permissions.has(permission));
 }
 
 export async function requireUser() {

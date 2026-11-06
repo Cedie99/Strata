@@ -5,6 +5,7 @@ import { pickBranch } from "@/core/branch-actions";
 import { getBranchScope } from "@/core/branches";
 import { brandProps, getBranding } from "@/core/branding";
 import { getSettings } from "@/core/settings";
+import { waitingFor } from "@/modules/approvals/engine";
 import { getModules } from "@/modules/registry";
 import { logout } from "../login/actions";
 import { BranchPicker, MenuBar, UserMenu } from "./menu-bar";
@@ -21,11 +22,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Each module contributes its own menu, filtered by what this user may see. Modules placed in
   // another module's menu (e.g. an admin-built Item Master under Inventory) add their items to it,
   // so a user who can only see the Item Master still gets an Inventory menu with just that.
+  // How many requests wait for this user, shown on the Approvals menu.
+  const waiting = (await waitingFor(user, scope.ids)).length;
   const own = modules.filter((m) => !m.menu);
   const sections = own
     .map((m) => ({
       id: m.id,
       name: m.name,
+      badge: m.id === "approvals" ? waiting : 0,
       nav: [m, ...modules.filter((p) => p.menu === m.id)]
         .flatMap((x) => x.nav)
         .filter((item) => can(user, item.permission)),

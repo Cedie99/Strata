@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { NavItem } from "@/modules/types";
 
-type Section = { id: string; name: string; nav: NavItem[] };
+type Section = { id: string; name: string; nav: NavItem[]; /** A count shown next to the name, e.g. approvals waiting. */ badge?: number };
 
 const isUnder = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -69,6 +69,11 @@ export function MenuBar({ sections }: { sections: Section[] }) {
                 className={`${item} h-9 w-full md:h-full ${activeId === s.id ? "bg-menubar-active shadow-[inset_0_-3px_0_var(--accent)]" : open === s.id ? "bg-menubar-active" : "hover:bg-white/10"}`}
               >
                 {s.name}
+                {!!s.badge && (
+                  <span className="ml-1.5 rounded-full bg-accent px-1.5 text-[11px] leading-[18px] font-bold text-black" aria-label={`${s.badge} waiting`}>
+                    {s.badge}
+                  </span>
+                )}
               </button>
               {open === s.id && (
                 <div className="z-50 min-w-56 border border-black/40 bg-menubar py-1 shadow-lg md:absolute md:top-full md:left-0">

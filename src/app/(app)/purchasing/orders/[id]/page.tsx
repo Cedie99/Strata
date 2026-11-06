@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ApprovalTrail } from "@/components/approval-trail";
 import { PrintButton } from "@/components/print/print-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -181,6 +182,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           ))}
         </tbody>
       </DataTable>
+      <div className="mt-6 max-w-xl">
+        <ApprovalTrail documentId={id} />
+      </div>
     </>
   );
 }

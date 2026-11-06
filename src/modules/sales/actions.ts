@@ -9,9 +9,10 @@ import { getBranchScope } from "@/core/branches";
 import { db } from "@/core/db";
 import { formObject, fromZod, type ActionState } from "@/core/forms";
 import { runPosting as posting } from "@/core/posting";
+import { submit } from "@/modules/approvals/engine";
 import { P } from "./module";
-import { postInvoice, postPayment, voidInvoice } from "./posting";
-import { customerSchema, invoiceSchema, paymentSchema } from "./schemas";
+import { postPayment } from "./posting";
+import { customerSchema, paymentSchema } from "./schemas";
 
 const isUniqueViolation = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
 
@@ -48,26 +49,23 @@ export async function saveCustomer(id: string | null, _state: ActionState, formD
 
 export async function saveInvoice(_state: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requirePermission(P.invoicesPost);
-  const parsed = invoiceSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fromZod(parsed.error);
   const scope = await getBranchScope();
-
-  const result = await posting((tx) => postInvoice(tx, user.id, parsed.data, scope.mayUse));
-  if ("error" in result) return { error: result.error };
-
+  // Posted at once, or sent for approval (below cost, high discount, over credit limit).
+  const result = await submit("SalesInvoice", formObject(formData), user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/", "layout");
-  redirect(`/sales/invoices/${result.value.id}`);
+  redirect(result.redirect);
 }
 
 export async function cancelInvoice(id: string): Promise<ActionState> {
   const user = await requirePermission(P.invoicesPost);
   const scope = await getBranchScope();
 
-  const result = await posting((tx) => voidInvoice(tx, user.id, id, scope.mayUse));
-  if ("error" in result) return { error: result.error };
-
+  const result = await submit("InvoiceVoid", { id }, user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/", "layout");
-  return { ok: `${result.value.number} is void and its stock was received back.` };
+  if (!result.posted) redirect(result.redirect);
+  return { ok: "The invoice is void and its stock was received back." };
 }
 
 // ─────────────── Payments ───────────────

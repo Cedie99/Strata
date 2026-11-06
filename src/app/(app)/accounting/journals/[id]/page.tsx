@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { ApprovalTrail } from "@/components/approval-trail";
 import { PrintButton } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -121,6 +122,9 @@ export default async function JournalPage({ params }: { params: Promise<{ id: st
             <p className="px-1 text-xs text-muted">This entry belongs to its document. To undo it, void or correct the document.</p>
           )}
         </div>
+      </div>
+      <div className="mt-6 max-w-xl">
+        <ApprovalTrail documentId={id} />
       </div>
     </>
   );

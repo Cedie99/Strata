@@ -17,6 +17,7 @@ with the documents behind them.
 | **Purchasing** | Suppliers, purchase orders, receiving reports, supplier bills with input VAT, payments with expanded withholding tax (EWT), payables aging |
 | **Finance** | Business dashboard (revenue, margins, receivables, cash flow, inventory) and cash book |
 | **Accounting** | Automatic journal entries, income statement, balance sheet, trial balance, general ledger, manual journals, month-end close |
+| **Approvals** | Approval rules by amount or condition, approvers by role in up to four levels, maker-checker, an inbox, and the approval trail on every document |
 | **BIR** | Books of accounts, SLS / SLP with RELIEF data files, 2550Q, 1601-EQ / QAP and SAWT worksheets, Form 2307 for suppliers, CAS readiness checks |
 | **Setup** | Users, roles and permissions, branches, document numbering, company settings, branding, tamper-evident audit log |
 | **Custom modules** | New record types, forms, menus, rules and approvals built in the browser without code |
@@ -198,6 +199,23 @@ Code: `src/modules/purchasing/` (posting rules in `posting.ts`), pages under `sr
   one rolled-back transaction, then runs every BIR report read-only on the real data.
 - Not yet tracked: input VAT carried over, VAT on imports, capital goods, VAT withheld by government customers;
   QAP and SAWT are Excel only.
+
+## Approval workflows
+
+- Actions that post a PO, supplier payment, sales invoice, cash entry, manual journal or reversal, or void an invoice
+  or bill call `submit(kind, form, user, scope)` (`src/modules/approvals/engine.ts`) instead of posting directly.
+  With no matching active rule the document is posted at once. Otherwise an `ApprovalRequest` (numbered
+  `APR-…`) keeps the submitted form, what approvers see and why it needs approval; nothing is posted.
+- Rules (`ApprovalRule`, Approvals → Approval rules, `approvals.rules.manage`): a trigger (PO total, supplier payment,
+  cash out, manual journal, invoice / bill void, below cost, discount %, credit limit), a threshold and ordered role
+  levels. All matching rules apply; their roles become the request's steps, each role once.
+- `decide()` checks maker-checker (never the requester, never two levels by one person, holder of the step's role,
+  branch access). The last approval re-validates the stored form and posts it **in the same transaction**, as the
+  requester (who must still have the permission); if posting fails nothing is recorded.
+- Requests and steps are permanent: DB triggers refuse deletes and any change once decided.
+- Kinds live in `src/modules/approvals/kinds.ts` (parse, describe, facts, execute). Customers gained `creditLimit`.
+- Check: `npx tsx --conditions=react-server prisma/approvals-check.ts` runs 35 checks in one rolled-back transaction
+  (the shared Prisma client is proxied into it, so the engine's own queries are rolled back too).
 
 ## Printed documents
 

@@ -21,6 +21,7 @@ export async function seriesGaps(): Promise<SeriesCheck[]> {
     GoodsReceipt: () => db.goodsReceipt.findMany({ select: { number: true } }),
     SupplierBill: () => db.supplierBill.findMany({ select: { number: true } }),
     SupplierPayment: () => db.supplierPayment.findMany({ select: { number: true } }),
+    ApprovalRequest: () => db.approvalRequest.findMany({ select: { number: true } }),
   };
   const results = await Promise.all(
     Object.entries(sources).map(async ([docType, load]) => {

@@ -43,13 +43,16 @@ BIR rules), sold first as one installation per client.
 - [x] "Print / Save as PDF" on every document page (2026-11-06)
 - [ ] Print payment receipt, AP voucher and check voucher once real ones exist, and sign off the layouts on paper
 
-**4. Configurable approval workflows**
-- [ ] Approval rules per document type: who approves, amount thresholds, one or more levels in order
-- [ ] Maker-checker: the creator can never approve their own document
-- [ ] "Waiting for my approval" inbox with approve / reject and a reason
-- [ ] Rules from the compliance plan: manual journals, voids, payment reversals, cash out over a limit,
-      below-cost / high-discount sales, credit-limit breaches, purchase orders over a limit
-- [ ] Approval history on each document and in the audit log
+**4. Configurable approval workflows** — built 2026-11-06
+- [x] Approval rules per document type: who approves (roles), amount thresholds, up to four levels in order (2026-11-06)
+- [x] Maker-checker: the requester can never approve their own request; one person approves one level (2026-11-06)
+- [x] "Waiting for my approval" inbox with approve / reject and a reason; count on the Approvals menu (2026-11-06)
+- [x] Rules from the compliance plan: manual journals and reversals, invoice and bill voids, cash out over a limit,
+      below-cost / high-discount sales, credit-limit breaches (customer credit limit added), purchase orders
+      and supplier payments over a limit (2026-11-06)
+- [x] Approval history on each document, in Approvals → Requests and in the audit log; requests are permanent (2026-11-06)
+- [ ] Notifications (in-app / email) when something waits for you — see Tier 2 notifications
+- [ ] Try it with real roles (e.g. Purchasing Manager, Owner) and sign off
 
 ## Tier 2 — moves Strata up from small to mid-size clients
 

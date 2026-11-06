@@ -15,6 +15,7 @@ export type CustomerValues = {
   vatCode: string;
   cwtRate: string;
   cwtAtc: string;
+  creditLimit: string;
   isActive: boolean;
 };
 
@@ -50,6 +51,13 @@ export function CustomerForm({
             required
           />
         </div>
+        <TextField
+          name="creditLimit"
+          label="Credit limit"
+          inputMode="decimal"
+          defaultValue={values?.creditLimit ?? "0"}
+          hint="Most this customer may owe at once; 0 = no limit. An approval rule can hold invoices that go over it."
+        />
         <div className="grid gap-4 sm:grid-cols-3">
           <SelectField
             name="vatCode"

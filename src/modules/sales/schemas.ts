@@ -43,6 +43,8 @@ export const customerSchema = z.object({
     return !d.isNegative() && d.lessThanOrEqualTo(32);
   }, "Withholding rate must be between 0 and 32%"),
   cwtAtc: z.string().trim().toUpperCase().max(10).default(""),
+  /** Most the customer may owe; blank or 0 = no limit. */
+  creditLimit: z.string().trim().default("").transform((v) => v || "0").pipe(notNegative("Credit limit")),
   isActive: checkbox,
 });
 

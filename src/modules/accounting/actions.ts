@@ -9,9 +9,9 @@ import { getBranchScope } from "@/core/branches";
 import { db } from "@/core/db";
 import { formObject, fromZod, type ActionState } from "@/core/forms";
 import { PostingError, runPosting } from "@/core/posting";
-import { postJournal, reverseJournal } from "./ledger";
-import { CONTROL_ACCOUNTS, P } from "./module";
-import { accountSchema, manualJournalSchema } from "./schemas";
+import { submit } from "@/modules/approvals/engine";
+import { P } from "./module";
+import { accountSchema } from "./schemas";
 
 const isUniqueViolation = (e: unknown) => e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
 
@@ -55,38 +55,15 @@ export async function saveAccount(id: string | null, _state: ActionState, formDa
 }
 
 // ─────────────── Manual journals ───────────────
+// Posted at once, or sent for approval when an approval rule for manual journals matches.
 
 export async function saveManualJournal(_state: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requirePermission(P.journalPost);
-  const parsed = manualJournalSchema.safeParse(formObject(formData));
-  if (!parsed.success) return fromZod(parsed.error);
   const scope = await getBranchScope();
-  const { date, memo, lines } = parsed.data;
-
-  const result = await runPosting(async (tx) => {
-    const accounts = await tx.account.findMany({ where: { id: { in: lines.map((l) => l.accountId) } } });
-    const byId = new Map(accounts.map((a) => [a.id, a]));
-    lines.forEach((l, i) => {
-      const a = byId.get(l.accountId);
-      if (!a) throw new PostingError(`Line ${i + 1}: that account does not exist.`);
-      if (a.systemKey && CONTROL_ACCOUNTS.includes(a.systemKey as never))
-        throw new PostingError(`Line ${i + 1}: ${a.code} · ${a.name} is kept by its own records (invoices, bills, payments, stock, receipts) and cannot take manual entries.`);
-      if (!scope.mayUse(l.branchId)) throw new PostingError(`Line ${i + 1}: you cannot post to that branch.`);
-    });
-    const entry = await postJournal(tx, {
-      date,
-      memo,
-      sourceType: "Manual",
-      userId: user.id,
-      lines: lines.map((l) => ({ account: { id: l.accountId }, branchId: l.branchId, debit: l.debit, credit: l.credit, memo: l.memo })),
-    });
-    if (!entry) throw new PostingError("The entry has no amounts.");
-    return entry;
-  });
-  if ("error" in result) return { error: result.error };
-
+  const result = await submit("ManualJournal", formObject(formData), user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/accounting", "layout");
-  redirect(`/accounting/journals/${result.value.id}`);
+  redirect(result.redirect);
 }
 
 /** Reverses a manual journal on a date the user picks (usually today, or the first day of the next month). */
@@ -95,25 +72,10 @@ export async function reverseManualJournal(id: string, _state: ActionState, form
   const date = formData.get("date");
   if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { fieldErrors: { date: ["Pick the reversal date"] } };
   const scope = await getBranchScope();
-
-  const result = await runPosting(async (tx) => {
-    const original = await tx.journalEntry.findUnique({ where: { id }, include: { lines: true } });
-    if (!original) throw new PostingError("That journal entry does not exist.");
-    if (original.sourceType !== "Manual")
-      throw new PostingError("Only manual journals are reversed here. Entries from documents are reversed by voiding the document.");
-    if (original.lines.some((l) => !scope.mayUse(l.branchId))) throw new PostingError("This entry touches a branch you cannot post to.");
-    return reverseJournal(tx, id, {
-      date: new Date(`${date}T00:00:00`),
-      sourceType: "Reversal",
-      sourceId: id,
-      memo: `Reversal of ${original.number}: ${original.memo}`,
-      userId: user.id,
-    });
-  });
-  if ("error" in result) return { error: result.error };
-
+  const result = await submit("JournalReversal", { id, date }, user, scope);
+  if ("state" in result) return result.state;
   revalidatePath("/accounting", "layout");
-  redirect(`/accounting/journals/${result.value!.id}`);
+  redirect(result.redirect);
 }
 
 // ─────────────── Periods ───────────────

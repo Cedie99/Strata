@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { ApprovalTrail } from "@/components/approval-trail";
 import { PrintButton, PrintLink } from "@/components/print/print-button";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -221,6 +222,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           ))}
         </tbody>
       </DataTable>
+      <div className="mt-6 max-w-xl">
+        <ApprovalTrail documentId={id} />
+      </div>
     </>
   );
 }

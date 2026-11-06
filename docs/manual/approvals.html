@@ -1,0 +1,181 @@
+<title>Strata Approvals Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Michroma&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="manual.css">
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Strata ERP · User manual · Approvals</p>
+    <h1>Ask → Approve → Post</h1>
+    <p class="lead">Your administrator decides which documents need a second pair of eyes and who looks at them, in which order. A document that needs approval is not posted when you save it: it waits as a request, and is posted only after the last approver says yes.</p>
+  </div>
+</header>
+<nav class="pages" aria-label="Manual pages">
+  <div class="wrap">
+    <a href="https://claude.ai/artifact/FjQsMNTjouzEEMWKaHBr2R">Start here</a>
+    <a href="https://claude.ai/artifact/HVwFThwKEk3dgrNsgbihJL">Inventory</a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S">Sales</a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu">Purchasing</a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd">Finance &amp; Accounting</a>
+    <a href="https://claude.ai/artifact/UZgxZToK9b12bvYCzKnUeq">BIR</a>
+    <a href="https://claude.ai/artifact/E2qB5FBAt7r3qLd7WJcT7a" aria-current="page">Approvals</a>
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK">Setup &amp; Security</a>
+    <a href="https://claude.ai/artifact/F5Zjqr7dpQ7BzEndXZWTRW">Custom modules</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toc"><span>On this page</span><a href="#flow">How it works</a><a href="#covered">What can need approval</a><a href="#screens">Each screen</a><a href="#rules">Rules of the game</a><a href="#howto">How to</a></div>
+
+  <h2 id="flow">How it works</h2>
+  <p class="sub">Saving a document checks the approval rules first. No rule matches: it is posted at once, as before.</p>
+  <ol class="chain" style="--steps: 4">
+    <li><div class="doc">You save</div><div class="q">A PO, payment, void, journal…</div><div class="fx"><span class="chip">rules checked</span></div></li>
+    <li><div class="doc">Request</div><div class="q">Numbered APR-…; nothing posted yet</div><div class="fx"><span class="chip none">waiting</span></div></li>
+    <li><div class="doc">Approvers</div><div class="q">Level 1, then level 2 …</div><div class="fx"><span class="chip up">approve</span><span class="chip down">reject</span></div></li>
+    <li><div class="doc">Posted</div><div class="q">After the last approval</div><div class="fx"><span class="chip up">document number</span><span class="chip">stock / ledger</span></div></li>
+  </ol>
+  <div class="note"><b>Nothing happens until it is approved.</b>A waiting purchase order has no PO number, a waiting invoice does not take stock, a waiting cash out does not touch the cash book. A rejected or withdrawn request leaves no trace in the books, only in the approval history.</div>
+
+  <h2 id="covered">What can need approval</h2>
+  <p class="sub">The administrator picks one of these for each rule, with a limit where it applies.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>When</th><th>Limit</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><th>Purchase order total</th><td>From an amount (with VAT)</td><td>POs from ₱50,000 need the purchasing manager; from ₱500,000 the owner too</td></tr>
+        <tr><th>Payment to a supplier</th><td>From an amount applied to bills</td><td>Payments from ₱100,000 need the finance manager</td></tr>
+        <tr><th>Cash out (cash book)</th><td>From an amount</td><td>Cash out from ₱5,000 needs the branch manager</td></tr>
+        <tr><th>Manual journal or reversal</th><td>From total debits; 0 = every one</td><td>Every manual journal needs the accountant</td></tr>
+        <tr><th>Voiding a sales invoice</th><td>From the invoice total; 0 = every void</td><td>Every void needs the sales manager</td></tr>
+        <tr><th>Voiding a supplier bill</th><td>From the bill total; 0 = every void</td><td>Every void needs the AP supervisor</td></tr>
+        <tr><th>Selling below cost</th><td>—</td><td>Any line priced under the product's cost</td></tr>
+        <tr><th>Discount on a sale</th><td>More than a percent below list price</td><td>Discounts over 10% need the sales manager</td></tr>
+        <tr><th>Customer over credit limit</th><td>The customer's own credit limit</td><td>An invoice that takes what they owe above their limit</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="screens">Each screen</h2>
+  <p class="sub">Under the <b>Approvals</b> menu. The number on the menu is how many requests wait for you.</p>
+
+  <section class="screen">
+    <div class="n">1</div>
+    <div>
+      <h3>Waiting for my approval</h3>
+      <div class="menu">Approvals → Waiting for my approval</div>
+      <p>Requests whose current step is yours: you hold the step's role, you did not ask for it, and you did not approve an earlier step. Open one to decide.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">2</div>
+    <div>
+      <h3>A request</h3>
+      <div class="menu">Click a request number</div>
+      <p>What was submitted (the same figures and lines you would see on the document), why it needs approval, and each step with who decided, when and their note.</p>
+      <ul>
+        <li><b>Approve</b> (note optional). On the last step the button reads <b>Approve and post</b>: the document is posted at that moment, in the requester's name, and the request links to it.</li>
+        <li><b>Reject</b> needs a reason, which the requester sees. Nothing is posted.</li>
+        <li>The requester can <b>Withdraw request</b> while it is still waiting.</li>
+        <li>If the document can no longer be posted when it is approved (for example, the stock is gone or the month is closed), the approval is refused with the reason and the request keeps waiting; reject it and submit a new one.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">3</div>
+    <div>
+      <h3>Requests</h3>
+      <div class="menu">Approvals → Requests</div>
+      <p>Your requests, newest first, with their status (waiting, approved, rejected, withdrawn) and the posted document. With the permission "See every approval request", you see everyone's in your branches; filter by status.</p>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">4</div>
+    <div>
+      <h3>Approval rules</h3>
+      <div class="menu">Approvals → Approval rules (permission "Manage approval rules")</div>
+      <p>Name, <b>When</b> (one of the triggers above), the limit, and who approves: up to four roles, level 1 first. Untick Active to pause a rule.</p>
+      <ul>
+        <li>A role marked ⚠ has no active user: requests would wait forever, so give the role to someone.</li>
+        <li>When several rules match one document, it needs all their approvers, each role once, in order.</li>
+        <li>Changing or deleting a rule affects new documents only; waiting requests keep the steps they were given.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="n">5</div>
+    <div>
+      <h3>On the document</h3>
+      <div class="menu">Purchase orders, payments made, bills, invoices, journal entries</div>
+      <p>An <b>Approvals</b> box at the bottom shows the request that let it be posted (who approved, when) and any void or reversal still waiting.</p>
+    </div>
+  </section>
+
+  <h2 id="rules">Rules of the game</h2>
+  <p class="sub">The controls auditors look for, enforced by the system.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Rule</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr><th>Maker-checker</th><td>The person who asks can never approve their own request, even an administrator.</td></tr>
+        <tr><th>One person, one step</th><td>Someone who approved level 1 cannot also approve level 2.</td></tr>
+        <tr><th>In order</th><td>Level 2 sees nothing to do until level 1 has approved.</td></tr>
+        <tr><th>Permanent history</th><td>Requests and decisions are never deleted or edited (the database refuses), and every decision is in the audit log.</td></tr>
+        <tr><th>Branches</th><td>Approvers only see requests of branches they work in.</td></tr>
+        <tr><th>Still allowed?</th><td>When it is finally posted, the requester must still have the permission to post that document.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="howto">How to</h2>
+  <p class="sub">The common jobs, step by step.</p>
+  <div class="howtos">
+    <div class="howto">
+      <h3>Require approval for large POs</h3>
+      <ol>
+        <li>Create the role (e.g. "Purchasing Manager") under Setup → Roles and give it to the right people.</li>
+        <li>Approvals → Approval rules → New rule.</li>
+        <li>When: Purchase order total; From amount: 50000; Level 1: Purchasing Manager.</li>
+        <li>For a second signature above ₱500,000, add another rule with level 1 Purchasing Manager and level 2 Owner.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Approve or reject</h3>
+      <ol>
+        <li>Click the number on the Approvals menu.</li>
+        <li>Open the request and check the figures and lines.</li>
+        <li>Approve, or reject with a reason.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>Stop sales over a credit limit</h3>
+      <ol>
+        <li>Set each customer's <b>Credit limit</b> on the customer page (0 = no limit).</li>
+        <li>Add a rule: When "Customer over credit limit", level 1 Sales Manager.</li>
+        <li>Invoices that would take a customer over their limit now wait.</li>
+      </ol>
+    </div>
+    <div class="howto">
+      <h3>My request is stuck</h3>
+      <ol>
+        <li>Open it from Approvals → Requests to see which role it waits for.</li>
+        <li>Ask someone with that role (not you) to look at it.</li>
+        <li>If nobody has the role, ask the administrator; or withdraw it.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Related pages</h2>
+  <div class="related">
+    <a href="https://claude.ai/artifact/6MK6oVvrG6ooT3SZCH3PgK"><b>Setup &amp; Security</b><span>Roles: who can approve what</span></a>
+    <a href="https://claude.ai/artifact/C6XexWvG1Ki87tK426vcRu"><b>Purchasing</b><span>POs, payments and bill voids that can wait</span></a>
+    <a href="https://claude.ai/artifact/1q5sFEkd6sPa8QN9BhRm3S"><b>Sales</b><span>Discounts, below-cost sales, credit limits, voids</span></a>
+    <a href="https://claude.ai/artifact/9YoCs44j8zgkPhZ5j7tSrd"><b>Finance &amp; Accounting</b><span>Cash out and manual journals</span></a>
+  </div>
+
+  <footer>Strata ERP user manual · Approvals · updated November 6, 2026.</footer>
+</main>

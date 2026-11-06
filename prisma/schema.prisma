@@ -42,6 +42,8 @@ model User {
   goodsReceipts    GoodsReceipt[]
   supplierBills    SupplierBill[]
   supplierPayments SupplierPayment[]
+  approvalRequests ApprovalRequest[]  @relation("ApprovalRequestedBy")
+  approvalSteps    ApprovalStep[]     @relation("ApprovalDecidedBy")
 }
 
 model Role {
@@ -52,8 +54,9 @@ model Role {
   isSystem    Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  users       UserRole[]
-  permissions RolePermission[]
+  users          UserRole[]
+  permissions    RolePermission[]
+  approvalLevels ApprovalRuleLevel[]
 }
 
 model UserRole {
@@ -131,6 +134,7 @@ model Branch {
   goodsReceipts    GoodsReceipt[]
   supplierBills    SupplierBill[]
   supplierPayments SupplierPayment[]
+  approvalRequests ApprovalRequest[]
 }
 
 model UserBranch {
@@ -289,20 +293,21 @@ model ItemClass {
 // so a day never shifts across the UTC boundary.
 
 model Customer {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  name      String
-  email     String   @default("")
-  phone     String   @default("")
-  address   String   @default("")
-  termsDays Int      @default(30) // invoice due date = invoice date + terms
-  tin       String   @default("") // e.g. 123-456-789-00000; needed on the sales list (SLS) and SAWT
-  vatCode   String   @default("VAT") // default VAT treatment of sales to them: VAT | ZERO | EXEMPT
-  cwtRate   Decimal  @default(0) // percent the customer usually withholds from our invoices (Form 2307), e.g. 1
-  cwtAtc    String   @default("") // ATC of that withholding, e.g. WC158
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  email       String   @default("")
+  phone       String   @default("")
+  address     String   @default("")
+  termsDays   Int      @default(30) // invoice due date = invoice date + terms
+  tin         String   @default("") // e.g. 123-456-789-00000; needed on the sales list (SLS) and SAWT
+  vatCode     String   @default("VAT") // default VAT treatment of sales to them: VAT | ZERO | EXEMPT
+  cwtRate     Decimal  @default(0) // percent the customer usually withholds from our invoices (Form 2307), e.g. 1
+  cwtAtc      String   @default("") // ATC of that withholding, e.g. WC158
+  creditLimit Decimal  @default(0) // most the customer may owe; 0 = no limit (an approval rule can stop invoices above it)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   invoices     SalesInvoice[]
   journalLines JournalLine[]
@@ -766,4 +771,88 @@ model CustomRecord {
   decidedBy User?        @relation("CustomRecordDecidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
 
   @@index([entityId, createdAt])
+}
+
+// ─────────────────────────── Approvals ───────────────────────────
+// Documents that match an approval rule are not posted when saved: they wait as an ApprovalRequest holding the
+// form as it was submitted. Each step must be approved, in order, by someone with the step's role who is not
+// the requester and has not approved an earlier step. After the last approval the document is posted (with
+// the requester as its creator); a rejection ends the request and nothing is posted.
+
+model ApprovalRule {
+  id        String   @id @default(cuid())
+  name      String
+  // What starts it: PO_AMOUNT | SUPPLIER_PAYMENT_AMOUNT | CASH_OUT_AMOUNT | MANUAL_JOURNAL | INVOICE_VOID | BILL_VOID |
+  // SALE_BELOW_COST | SALE_DISCOUNT | CREDIT_LIMIT (see src/modules/approvals/module.ts)
+  trigger   String
+  threshold Decimal  @default(0) // amount from which it applies, or the discount percent; 0 = always
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  levels ApprovalRuleLevel[]
+
+  @@index([trigger, isActive])
+}
+
+// Who approves, in order: level 1 first, then 2 …
+model ApprovalRuleLevel {
+  id     String @id @default(cuid())
+  ruleId String
+  level  Int
+  roleId String
+
+  rule ApprovalRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  role Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, level])
+}
+
+model ApprovalRequest {
+  id            String    @id @default(cuid())
+  number        String    @unique // e.g. APR-MNL-2026-000001
+  // What is waiting: PurchaseOrder | SupplierPayment | CashOut | ManualJournal | JournalReversal | InvoiceVoid | BillVoid | SalesInvoice
+  kind          String
+  targetId      String? // the existing document a void or reversal acts on
+  branchId      String
+  amount        Decimal
+  title         String // e.g. "Purchase order · ABC Trading"
+  details       String // JSON: [{ label, value }] shown to approvers
+  reasons       String // JSON: why approval is needed, one line per matched rule
+  payload       String // JSON: the form as submitted, posted again after approval
+  status        String    @default("PENDING") // PENDING | APPROVED | REJECTED | CANCELLED
+  step          Int       @default(1) // the level waiting now
+  requestedById String
+  requestedAt   DateTime  @default(now())
+  decidedAt     DateTime?
+  resultId      String? // the posted document
+  resultNumber  String    @default("")
+  resultHref    String    @default("")
+
+  branch      Branch         @relation(fields: [branchId], references: [id])
+  requestedBy User           @relation("ApprovalRequestedBy", fields: [requestedById], references: [id], onDelete: Restrict)
+  steps       ApprovalStep[]
+
+  @@index([status, branchId])
+  @@index([kind, resultId])
+  @@index([targetId])
+}
+
+// One approval level of a request, copied from the rules when it was made (later rule changes do not affect it).
+model ApprovalStep {
+  id        String    @id @default(cuid())
+  requestId String
+  level     Int
+  roleId    String
+  roleName  String
+  ruleName  String
+  status    String    @default("WAITING") // WAITING | APPROVED | REJECTED
+  deciderId String?
+  decidedAt DateTime?
+  reason    String    @default("")
+
+  request ApprovalRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  decider User?           @relation("ApprovalDecidedBy", fields: [deciderId], references: [id], onDelete: Restrict)
+
+  @@unique([requestId, level])
 }

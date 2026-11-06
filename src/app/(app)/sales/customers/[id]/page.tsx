@@ -75,6 +75,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               vatCode: customer.vatCode,
               cwtRate: customer.cwtRate.toString(),
               cwtAtc: customer.cwtAtc,
+              creditLimit: customer.creditLimit.toString(),
               isActive: customer.isActive,
             }}
           />

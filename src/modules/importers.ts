@@ -195,6 +195,7 @@ export async function getImporter(path: string[]): Promise<Importer> {
         { key: "vatCode", label: "VAT", hint: "VAT, ZERO or EXEMPT; blank = VAT", sample: "VAT" },
         { key: "cwtRate", label: "Withholds (%)", hint: "Percent the customer withholds (Form 2307); blank = 0", sample: "1" },
         { key: "cwtAtc", label: "Withholding ATC", hint: "e.g. WC158", sample: "WC158" },
+        { key: "creditLimit", label: "Credit limit", hint: "Blank or 0 = no limit", sample: "100000" },
         activeColumn,
       ],
       async run(rows, tx, userId) {
